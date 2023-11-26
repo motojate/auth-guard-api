@@ -1,5 +1,5 @@
 import { RefreshToken } from 'src/entity/RefreshToken';
-import { User } from 'src/entity/User';
+import { User } from 'src/user/entities/user.entity';
 import { DataSource } from 'typeorm';
 
 export const databaseProviders = [

@@ -5,17 +5,17 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from './User';
+import { User } from '../user/entities/user.entity';
 
 @Entity('REFRESH_TOKEN')
 export class RefreshToken {
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column({ unique: true })
-  token: string;
+  readonly token: string;
 
   @OneToOne(() => User, (user) => user.refreshToken)
   @JoinColumn({ name: 'user_seq' })
-  user: User;
+  readonly user: User;
 }
