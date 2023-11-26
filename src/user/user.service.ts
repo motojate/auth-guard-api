@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { SignUpMemberUser } from './dtos/user.dto';
 import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
+import { PrismaException } from 'src/shared/exceptions/prisma.exception';
 
 @Injectable()
 export class UserService {
@@ -11,12 +12,15 @@ export class UserService {
   async create(dto: SignUpMemberUser) {
     try {
       const hashedPassword = await generateHashedPassword(dto.password);
-      return this.prisma.user.create({
+      const user = await this.prisma.user.create({
         data: {
           userId: dto.userId,
           password: hashedPassword,
         },
       });
-    } catch (e) {}
+      return user;
+    } catch (e) {
+      throw new PrismaException();
+    }
   }
 }
