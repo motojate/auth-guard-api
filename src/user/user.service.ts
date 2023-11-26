@@ -1,5 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
-
+import { Injectable } from '@nestjs/common';
 import { SignUpMemberUser } from './dtos/user.dto';
 import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
