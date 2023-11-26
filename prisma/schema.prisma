@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ENUM 정의
+enum Status {
+  Y
+  W
+  N
+  D
+}
+
+enum MsgType {
+  EMAIL
+  SMS
+  PUSH
+}
+
+enum SiteType {
+  HEAL_GUARD
+  MEAL_GUARD
+  PILL_GUARD
+  MYEONJEOB_BOKKA
+}
+
+// MODEL 정의
+model User {
+  userSeq           String             @id @unique @default(uuid()) @map("user_seq")
+  userId            String             @unique @map("user_id")
+  password          String
+  status            Status             @default(Y)
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  refreshToken      RefreshToken?
+  emailVerification EmailVerification?
+  sites             UserSiteMapping[]
+
+  @@map("AT_MB_USER")
+}
+
+model Site {
+  id        Int               @id @unique @default(autoincrement())
+  name      SiteType
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+  users     UserSiteMapping[]
+
+  @@map("AT_MB_SITE")
+}
+
+model UserSiteMapping {
+  seq     String @id @unique @default(uuid())
+  uesrSeq String @map("user_seq")
+  siteId  Int    @map("site_id")
+  user    User   @relation(fields: [uesrSeq], references: [userSeq])
+  site    Site   @relation(fields: [siteId], references: [id])
+
+  @@map("AT_MB_USER_SITE_MAPPING")
+}
+
+model EmailVerification {
+  id         Int      @id @unique @default(autoincrement())
+  userId     String   @unique @map("user_id")
+  verifyCode String   @map("verify_code")
+  validTime  DateTime @map("valid_time")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [userId])
+
+  @@map("AT_MB_EMAIL_VERIFICATION")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userSeq   String   @unique @map("user_seq")
+  isRevoked Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userSeq], references: [userSeq])
+
+  @@map("AT_MB_REFRESH_TOKEN")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  msgType   MsgType  @map("msg_type")
+  status    Status
+  receiver  String
+  title     String?
+  content   String
+  sender    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("AT_MB_MESSAGE")
+}
+
+model IpBlackList {
+  id Int    @id @default(autoincrement())
+  ip String
+
+  @@map("AT_MB_IP_BLACK_LIST")
+}

@@ -1,22 +1,22 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DataSource, Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+
 import { SignUpMemberUser } from './dtos/user.dto';
-import { generateHashedPassword } from 'src/utils/password-hash.util';
-import { InjectRepository } from '@nestjs/typeorm';
+import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
+import { PrismaService } from 'src/shared/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: SignUpMemberUser) {
     try {
-      const user = new User();
-      user.userId = dto.userId;
-      user.password = await generateHashedPassword(dto.password);
-      return this.userRepository.save(user);
+      const hashedPassword = await generateHashedPassword(dto.password);
+      return this.prisma.user.create({
+        data: {
+          userId: dto.userId,
+          password: hashedPassword,
+        },
+      });
     } catch (e) {}
   }
 }
