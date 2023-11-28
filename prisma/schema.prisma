@@ -58,11 +58,12 @@ model Site {
 
 model UserSiteMapping {
   seq     String @id @unique @default(uuid())
-  uesrSeq String @map("user_seq")
+  userSeq String @map("user_seq")
   siteId  Int    @map("site_id")
-  user    User   @relation(fields: [uesrSeq], references: [userSeq])
+  user    User   @relation(fields: [userSeq], references: [userSeq])
   site    Site   @relation(fields: [siteId], references: [id])
 
+  @@unique([userSeq, siteId])
   @@map("AT_MB_USER_SITE_MAPPING")
 }
 
