@@ -5,6 +5,7 @@ import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { LoginAuthDto } from './dtos/auth.dto';
 import * as bcrypt from 'bcrypt';
+import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 
 @Injectable()
 export class AuthService {
@@ -23,9 +24,8 @@ export class AuthService {
     const user = await this.userService.findUniqueByUserIdAndSiteType(
       loginAuthDto,
     );
-    if (!user) {
-      throw new UnauthorizedException('Invalid userId');
-    }
+    if (!user) throw new InvalidUserException();
+
     const isValidPassword = await bcrypt.compare(
       loginAuthDto.password,
       user.user.password,
@@ -36,11 +36,11 @@ export class AuthService {
     return user;
   }
 
-  async login(user: User) {
+  async login(userSeq: string) {
     const payload = {
-      userSeq: user.userSeq,
+      userSeq: userSeq,
     };
-    const refreshToken = await this.createRefreshToken(user.userSeq);
+    const refreshToken = await this.createRefreshToken(userSeq);
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token: refreshToken,
