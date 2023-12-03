@@ -15,7 +15,6 @@ export class AuthController {
     @Response() res: ExpressResponse,
   ) {
     const user = await this.authService.validateUser(loginAuthDto);
-    if (!user) throw new InvalidUserException();
     const tokens = await this.authService.login(user.userSeq);
     res.cookie('access_token', tokens.access_token, { httpOnly: true });
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });

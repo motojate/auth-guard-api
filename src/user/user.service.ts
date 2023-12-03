@@ -45,7 +45,7 @@ export class UserService
 
   async findUniqueByUserIdAndSiteType(dto: LoginAuthDto) {
     try {
-      const user = this.prisma.userSiteMapping.findUnique({
+      const user = await this.prisma.userSiteMapping.findUnique({
         where: {
           siteUserId: {
             userId: dto.userId,
@@ -60,7 +60,7 @@ export class UserService
           },
         },
       });
-      console.log(user);
+
       return user;
     } catch (e) {
       throw new PrismaException();
