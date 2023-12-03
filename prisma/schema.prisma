@@ -34,7 +34,7 @@ enum SiteType {
 // MODEL 정의
 model User {
   userSeq           String             @id @unique @default(uuid()) @map("user_seq")
-  userId            String             @unique @map("user_id")
+  userId            String             @map("user_id")
   password          String
   status            Status             @default(Y)
   createdAt         DateTime           @default(now()) @map("created_at")
@@ -69,13 +69,14 @@ model UserSiteMapping {
 
 model EmailVerification {
   id         Int      @id @unique @default(autoincrement())
-  userId     String   @unique @map("user_id")
+  userSeq    String   @unique @map("user_seq")
+  userId     String   @map("user_id")
   verifyCode String   @map("verify_code")
   validTime  DateTime @map("valid_time")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [userId])
+  user User @relation(fields: [userSeq], references: [userSeq])
 
   @@map("AT_MB_EMAIL_VERIFICATION")
 }

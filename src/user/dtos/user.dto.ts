@@ -1,4 +1,6 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { SiteType } from '@prisma/client';
+import { IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { SITE_DATA } from 'src/shared/constants/db.constant';
 
 export class FindMemberUserDto {
   @IsString()
@@ -13,6 +15,9 @@ export class SignUpMemberUserDto {
   @IsString()
   @IsNotEmpty()
   readonly password: string;
+
+  @IsIn(SITE_DATA.map((item) => item.name))
+  readonly siteType: SiteType;
 }
 export class UpdateMemberUserDto {
   @IsString()

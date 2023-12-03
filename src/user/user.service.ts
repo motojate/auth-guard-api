@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  FindMemberUserDto,
-  SignUpMemberUserDto,
-  UpdateMemberUserDto,
-} from './dtos/user.dto';
+import { SignUpMemberUserDto, UpdateMemberUserDto } from './dtos/user.dto';
 import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { PrismaException } from 'src/shared/exceptions/prisma.exception';
@@ -27,10 +23,17 @@ export class UserService
         data: {
           userId: dto.userId,
           password: hashedPassword,
+          sites: {
+            create: {
+              userId: dto.userId,
+              siteName: dto.siteType,
+            },
+          },
         },
       });
       return user;
     } catch (e) {
+      console.log(e);
       throw new PrismaException();
     }
   }
