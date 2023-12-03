@@ -6,7 +6,7 @@ export class BaseException extends HttpException {
     message: string,
     status: HttpStatus,
   ) {
-    super({ code: _code, message }, status);
+    super({ code: _code, result: { error: { message } } }, status);
   }
 
   get code(): number {
