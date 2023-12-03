@@ -1,8 +1,15 @@
-import { Controller, HttpCode, Response, Body, Post } from '@nestjs/common';
+import {
+  Controller,
+  HttpCode,
+  Response,
+  Body,
+  Post,
+  Get,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dtos/auth.dto';
 import { Response as ExpressResponse } from 'express';
-import { InvalidUserException } from 'src/shared/exceptions/user.exception';
+import { BaseResponse } from 'src/shared/responses/base.response';
 
 @Controller('auth')
 export class AuthController {
