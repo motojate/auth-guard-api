@@ -47,8 +47,7 @@ model User {
 }
 
 model Site {
-  id        Int               @id @unique @default(autoincrement())
-  name      SiteType
+  name      SiteType          @id @unique
   createdAt DateTime          @default(now()) @map("created_at")
   updatedAt DateTime          @updatedAt @map("updated_at")
   users     UserSiteMapping[]
@@ -57,13 +56,14 @@ model Site {
 }
 
 model UserSiteMapping {
-  seq     String @id @unique @default(uuid())
-  userSeq String @map("user_seq")
-  siteId  Int    @map("site_id")
-  user    User   @relation(fields: [userSeq], references: [userSeq])
-  site    Site   @relation(fields: [siteId], references: [id])
+  seq      String   @id @unique @default(uuid())
+  userSeq  String   @map("user_seq")
+  userId   String   @map("user_id")
+  siteName SiteType @map("site_name")
+  user     User     @relation(fields: [userSeq], references: [userSeq])
+  site     Site     @relation(fields: [siteName], references: [name])
 
-  @@unique([userSeq, siteId])
+  @@unique([userId, siteName], name: "siteUserId")
   @@map("AT_MB_USER_SITE_MAPPING")
 }
 
