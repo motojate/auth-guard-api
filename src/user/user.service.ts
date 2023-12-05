@@ -15,6 +15,67 @@ export class UserService
   implements CrudService<User, SignUpMemberUserDto, UpdateMemberUserDto>
 {
   constructor(private readonly prisma: PrismaService) {}
+  findAll(): Promise<
+    {
+      userSeq: string;
+      userId: string;
+      password: string;
+      status: $Enums.Status;
+      authProvider: $Enums.AuthProvider;
+      createdAt: Date;
+      updatedAt: Date;
+    }[]
+  > {
+    throw new Error('Method not implemented.');
+  }
+  findByFilter(
+    filter: QueryFilter<{
+      userSeq: string;
+      userId: string;
+      password: string;
+      status: $Enums.Status;
+      authProvider: $Enums.AuthProvider;
+      createdAt: Date;
+      updatedAt: Date;
+    }>,
+  ): Promise<
+    {
+      userSeq: string;
+      userId: string;
+      password: string;
+      status: $Enums.Status;
+      authProvider: $Enums.AuthProvider;
+      createdAt: Date;
+      updatedAt: Date;
+    }[]
+  > {
+    throw new Error('Method not implemented.');
+  }
+  update(
+    id: string | number,
+    dto: UpdateMemberUserDto,
+  ): Promise<{
+    userSeq: string;
+    userId: string;
+    password: string;
+    status: $Enums.Status;
+    authProvider: $Enums.AuthProvider;
+    createdAt: Date;
+    updatedAt: Date;
+  }> {
+    throw new Error('Method not implemented.');
+  }
+  delete(id: string | number): Promise<{
+    userSeq: string;
+    userId: string;
+    password: string;
+    status: $Enums.Status;
+    authProvider: $Enums.AuthProvider;
+    createdAt: Date;
+    updatedAt: Date;
+  }> {
+    throw new Error('Method not implemented.');
+  }
 
   async create(dto: SignUpMemberUserDto) {
     try {
@@ -37,6 +98,8 @@ export class UserService
       throw new PrismaException();
     }
   }
+
+  // async createWithSocial()
 
   async findUnique(userSeq: string) {
     try {
@@ -68,62 +131,5 @@ export class UserService
     } catch (e) {
       throw new PrismaException();
     }
-  }
-
-  findAll(): Promise<
-    {
-      userSeq: string;
-      userId: string;
-      password: string;
-      status: $Enums.Status;
-      createdAt: Date;
-      updatedAt: Date;
-    }[]
-  > {
-    throw new Error('Method not implemented.');
-  }
-  findByFilter(
-    filter: QueryFilter<{
-      userSeq: string;
-      userId: string;
-      password: string;
-      status: $Enums.Status;
-      createdAt: Date;
-      updatedAt: Date;
-    }>,
-  ): Promise<
-    {
-      userSeq: string;
-      userId: string;
-      password: string;
-      status: $Enums.Status;
-      createdAt: Date;
-      updatedAt: Date;
-    }[]
-  > {
-    throw new Error('Method not implemented.');
-  }
-  update(
-    id: string | number,
-    dto: UpdateMemberUserDto,
-  ): Promise<{
-    userSeq: string;
-    userId: string;
-    password: string;
-    status: $Enums.Status;
-    createdAt: Date;
-    updatedAt: Date;
-  }> {
-    throw new Error('Method not implemented.');
-  }
-  delete(id: string | number): Promise<{
-    userSeq: string;
-    userId: string;
-    password: string;
-    status: $Enums.Status;
-    createdAt: Date;
-    updatedAt: Date;
-  }> {
-    throw new Error('Method not implemented.');
   }
 }

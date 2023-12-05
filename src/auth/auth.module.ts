@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UserModule } from 'src/user/user.module';
+import { JwtGoogleStrategy } from './jwt-social-google.strategy';
 
 @Module({
   imports: [
@@ -16,8 +17,8 @@ import { UserModule } from 'src/user/user.module';
     UserModule,
     EmailVerificationModule,
   ],
-  providers: [AuthService, JwtStrategy, PrismaService],
+  providers: [AuthService, JwtStrategy, JwtGoogleStrategy, PrismaService],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule, JwtStrategy],
+  exports: [AuthService, JwtModule, JwtGoogleStrategy, JwtStrategy],
 })
 export class AuthModule {}
