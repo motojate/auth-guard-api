@@ -29,7 +29,7 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
       picture: photos[0].value,
       site,
     };
-    console.log(user);
+
     done(null, user);
   }
 }

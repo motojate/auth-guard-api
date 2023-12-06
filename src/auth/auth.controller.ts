@@ -47,11 +47,15 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req) {
-    console.log(req.user.site);
-    // Google 로그인 후 콜백. 사용자 정보를 처리합니다.
-    // 예를 들어, 사용자 정보를 데이터베이스에 저장하거나 JWT 토큰을 생성할 수 있습니다.
-    const user = req.user; // Google 전략에서 반환한 사용자 정보
-    // 사용자 정보 처리 로직...
-    console.log('11', user);
+    const user = req.user;
+    switch (user.site as SiteType) {
+      case 'HEAL_GUARD':
+
+      case 'MEAL_GUARD':
+
+      case 'MYEONJEOB_BOKKA':
+
+      case 'PILL_GUARD':
+    }
   }
 }
