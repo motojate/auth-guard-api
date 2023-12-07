@@ -8,13 +8,11 @@ import {
   UseGuards,
   Req,
   Res,
-  Redirect,
   Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dtos/auth.dto';
 import { Response as ExpressResponse } from 'express';
-import { BaseResponse } from 'src/shared/responses/base.response';
 import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
 
@@ -35,8 +33,8 @@ export class AuthController {
     res.send();
   }
 
-  @Get('/login/google') //restAPI만들기. 엔드포인트는 /login/google.
-  @UseGuards(AuthGuard('google')) //인증과정을 거쳐야하기때문에 UseGuards를 써주고 passport인증으로 AuthGuard를 써준다. 이름은 google로
+  @Get('/login/google')
+  @UseGuards(AuthGuard('google'))
   async loginGoogle(@Query('site') site: SiteType, @Res() res) {
     const state = encodeURIComponent(JSON.stringify({ site }));
 
