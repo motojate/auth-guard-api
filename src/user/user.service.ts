@@ -8,7 +8,7 @@ import {
   CrudService,
   QueryFilter,
 } from 'src/shared/interfaces/factory.interface';
-import { LoginAuthDto } from 'src/auth/dtos/auth.dto';
+import { LoginAuthDto, LoginAuthWithSocialDto } from 'src/auth/dtos/auth.dto';
 
 @Injectable()
 export class UserService
@@ -110,6 +110,32 @@ export class UserService
   }
 
   async findUniqueByUserIdAndSiteType(dto: LoginAuthDto) {
+    try {
+      const user = await this.prisma.userSiteMapping.findUnique({
+        where: {
+          siteUserId: {
+            userId: dto.userId,
+            siteName: dto.siteType,
+          },
+        },
+        include: {
+          user: {
+            select: {
+              password: true,
+            },
+          },
+        },
+      });
+
+      return user;
+    } catch (e) {
+      throw new PrismaException();
+    }
+  }
+
+  async findUniqueByUserIdAndSiteTypeAndAuthProvider(
+    dto: LoginAuthWithSocialDto,
+  ) {
     try {
       const user = await this.prisma.userSiteMapping.findUnique({
         where: {

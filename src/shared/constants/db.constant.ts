@@ -1,4 +1,4 @@
-import { SiteType } from '@prisma/client';
+import { AuthProvider, SiteType } from '@prisma/client';
 
 export const SITE_DATA = [
   {
@@ -13,4 +13,11 @@ export const SITE_DATA = [
   {
     name: SiteType.PILL_GUARD,
   },
+];
+
+export const SOCIAL_DATA: AuthProvider[] = [
+  AuthProvider.GOOGLE,
+  AuthProvider.KAKAO,
+  AuthProvider.LOCAL,
+  AuthProvider.NAVER,
 ];
