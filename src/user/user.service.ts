@@ -116,6 +116,7 @@ export class UserService
           siteUserId: {
             userId: dto.userId,
             siteName: dto.siteType,
+            authProvider: 'LOCAL',
           },
         },
         include: {
@@ -142,6 +143,7 @@ export class UserService
           siteUserId: {
             userId: dto.userId,
             siteName: dto.siteType,
+            authProvider: dto.loginProvider,
           },
         },
         include: {
