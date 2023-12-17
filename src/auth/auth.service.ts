@@ -49,8 +49,17 @@ export class AuthService {
 
   private async createRefreshToken(userSeq: string): Promise<string> {
     const token = this.jwtService.sign({ seq: userSeq }, { expiresIn: '30d' });
-    await this.prisma.refreshToken.create({
-      data: { token, userSeq },
+    await this.prisma.refreshToken.upsert({
+      where: {
+        userSeq: userSeq,
+      },
+      create: {
+        token,
+        userSeq,
+      },
+      update: {
+        token,
+      },
     });
     return token;
   }
