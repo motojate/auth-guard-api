@@ -1,7 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { UserService } from 'src/user/user.service';
-import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
 
 export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private readonly userService: UserService) {
@@ -22,17 +21,11 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
     done: VerifyCallback,
   ) {
     const { name, emails, photos } = profile;
-    const { site } = req.query.state;
-    const dto: LoginAuthWithSocialDto = {
-      userId: '',
-      siteType: 'HEAL_GUARD',
-      loginProvider: 'GOOGLE',
-    };
+    const { site } = JSON.parse(req.query.state);
 
     const user = {
       email: emails[0].value,
-      firstName: name.givenName,
-      lastName: name.familyName,
+      name: name.displayName,
       picture: photos[0].value,
       site,
     };

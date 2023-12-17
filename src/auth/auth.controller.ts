@@ -12,16 +12,20 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dtos/auth.dto';
-import { Response as ExpressResponse } from 'express';
+import {
+  Response as ExpressResponse,
+  Request as ExpressRequest,
+} from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
+import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @HttpCode(200)
+  @HttpCode(201)
   async login(
     @Body() loginAuthDto: LoginAuthDto,
     @Response() res: ExpressResponse,
@@ -34,7 +38,6 @@ export class AuthController {
   }
 
   @Get('/login/google')
-  @UseGuards(AuthGuard('google'))
   async loginGoogle(
     @Query('site') site: SiteType,
     @Res() res: ExpressResponse,
@@ -46,16 +49,15 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req) {
-    const user = req.user;
-    switch (user.site as SiteType) {
-      case 'HEAL_GUARD':
-
-      case 'MEAL_GUARD':
-
-      case 'MYEONJEOB_BOKKA':
-
-      case 'PILL_GUARD':
-    }
+  async googleAuthRedirect(
+    @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
+    @Response() res: ExpressResponse,
+  ) {
+    const googleOAuthUser = req.user;
+    const user = await this.authService.OAuthLogin(googleOAuthUser);
+    const tokens = await this.authService.login(user.userSeq);
+    res.cookie('access_token', tokens.access_token, { httpOnly: true });
+    res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
+    res.send();
   }
 }

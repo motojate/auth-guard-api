@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { SignUpMemberUserDto, UpdateMemberUserDto } from './dtos/user.dto';
+import {
+  SignUpMemberUserDto,
+  SignUpSocialUserDto,
+  UpdateMemberUserDto,
+} from './dtos/user.dto';
 import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { PrismaException } from 'src/shared/exceptions/prisma.exception';
@@ -99,6 +103,28 @@ export class UserService
     }
   }
 
+  async createBySocial(dto: SignUpSocialUserDto) {
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          userId: dto.userId,
+          password: null,
+          authProvider: dto.loginProvider,
+          sites: {
+            create: {
+              userId: dto.userId,
+              siteName: dto.siteType,
+              authProvider: dto.loginProvider,
+            },
+          },
+        },
+      });
+      return user;
+    } catch (e) {
+      throw new PrismaException();
+    }
+  }
+
   // async createWithSocial()
 
   async findUnique(userSeq: string) {
@@ -109,14 +135,14 @@ export class UserService
     }
   }
 
-  async findUniqueByUserIdAndSiteType(dto: LoginAuthDto) {
+  async findUniqueByUserIdAndSiteType(dto: LoginAuthWithSocialDto) {
     try {
       const user = await this.prisma.userSiteMapping.findUnique({
         where: {
           siteUserId: {
             userId: dto.userId,
             siteName: dto.siteType,
-            authProvider: 'LOCAL',
+            authProvider: dto.loginProvider,
           },
         },
         include: {
