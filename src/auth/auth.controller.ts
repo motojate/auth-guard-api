@@ -37,7 +37,7 @@ export class AuthController {
     res.send();
   }
 
-  @Get('/login/google')
+  @Get('login/google')
   async loginGoogle(
     @Query('site') site: SiteType,
     @Res() res: ExpressResponse,
@@ -61,5 +61,13 @@ export class AuthController {
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
 
     res.redirect('http://localhost:3000');
+  }
+
+  @Get('jwt/check')
+  async jwtCookieCheck(@Req() req: ExpressRequest) {
+    const token = await this.authService.verifyToken(
+      req.cookies['access_token'],
+    );
+    console.log(token);
   }
 }

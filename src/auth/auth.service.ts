@@ -7,10 +7,6 @@ import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
-import {
-  SignUpMemberUserDto,
-  SignUpSocialUserDto,
-} from 'src/user/dtos/user.dto';
 
 @Injectable()
 export class AuthService {
