@@ -59,8 +59,16 @@ export class AuthController {
     const tokens = await this.authService.login(user.userSeq);
     res.cookie('access_token', tokens.access_token, { httpOnly: true });
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
-
-    res.redirect('http://localhost:3000');
+    switch (user.authProvider) {
+      case 'LOCAL':
+        res.redirect('http://localhost:3000');
+      case 'KAKAO':
+        res.redirect('http://localhost:3000');
+      case 'NAVER':
+        res.redirect('http://localhost:3000');
+      case 'GOOGLE':
+        res.redirect('http://localhost:3000');
+    }
   }
 
   @Get('jwt/check')
