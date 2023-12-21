@@ -19,6 +19,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Controller('auth')
 export class AuthController {
@@ -76,6 +77,7 @@ export class AuthController {
     const token = await this.authService.verifyToken(
       req.cookies['access_token'],
     );
+    if (token) throw new ExceptionsHandler();
     console.log(token);
   }
 }
