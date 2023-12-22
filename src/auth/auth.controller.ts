@@ -38,6 +38,14 @@ export class AuthController {
     res.send();
   }
 
+  @Post('logout')
+  @HttpCode(201)
+  async logout(@Response() res: ExpressResponse) {
+    res.cookie('access_token', '', { httpOnly: true, expires: new Date(0) });
+    res.cookie('refresh_token', '', { httpOnly: true, expires: new Date(0) });
+    res.send();
+  }
+
   @Get('login/google')
   async loginGoogle(
     @Query('site') site: SiteType,
@@ -73,6 +81,7 @@ export class AuthController {
   }
 
   @Get('jwt/check')
+  @UseGuards(AuthGuard('jwt'))
   async jwtCookieCheck(@Req() req: ExpressRequest) {
     const token = await this.authService.verifyToken(
       req.cookies['access_token'],
