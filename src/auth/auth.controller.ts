@@ -41,6 +41,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(201)
   async logout(@Response() res: ExpressResponse) {
+    // 블랙리스트 등록
     res.cookie('access_token', '', { httpOnly: true, expires: new Date(0) });
     res.cookie('refresh_token', '', { httpOnly: true, expires: new Date(0) });
     res.send();
