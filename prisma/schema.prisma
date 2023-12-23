@@ -122,3 +122,10 @@ model IpBlackList {
 
   @@map("AT_MB_IP_BLACK_LIST")
 }
+
+model TokenBlackList {
+  id    Int    @id @default(autoincrement())
+  token String @unique
+
+  @@map("AT_MB_TOKEN_BLACK_LIST")
+}
