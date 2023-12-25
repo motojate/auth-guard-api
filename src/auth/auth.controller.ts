@@ -40,8 +40,16 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(201)
-  async logout(@Response() res: ExpressResponse) {
-    // 블랙리스트 등록
+  async logout(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
+    const accessToken = await this.authService.verifyToken(
+      req.cookies['access_token'],
+    );
+    const refreshToken = await this.authService.verifyToken(
+      req.cookies['refresh_token'],
+    );
+    const updateBlackListToken = await this.authService.revokeRefreshToken(
+      refreshToken,
+    );
     res.cookie('access_token', '', { httpOnly: true, expires: new Date(0) });
     res.cookie('refresh_token', '', { httpOnly: true, expires: new Date(0) });
     res.send();
