@@ -80,7 +80,11 @@ export class AuthService {
   }
 
   async verifyToken(token: string): Promise<any> {
-    return this.jwtService.verify(token);
+    try {
+      return await this.jwtService.verify(token);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async OAuthLogin(googleOAuthUser: IOAuthGoogleUser) {

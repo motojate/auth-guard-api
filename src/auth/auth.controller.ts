@@ -33,8 +33,12 @@ export class AuthController {
   ) {
     const user = await this.authService.validateUser(loginAuthDto);
     const tokens = await this.authService.login(user.userSeq);
-    res.cookie('access_token', tokens.access_token, { httpOnly: true });
-    res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
+    res.cookie('access_token', tokens.access_token, {
+      httpOnly: true,
+    });
+    res.cookie('refresh_token', tokens.refresh_token, {
+      httpOnly: true,
+    });
     res.send();
   }
 
@@ -47,9 +51,9 @@ export class AuthController {
     const refreshToken = await this.authService.verifyToken(
       req.cookies['refresh_token'],
     );
-    const updateBlackListToken = await this.authService.revokeRefreshToken(
-      refreshToken,
-    );
+    // const updateBlackListToken = await this.authService.revokeRefreshToken(
+    //   refreshToken,
+    // );
     res.cookie('access_token', '', { httpOnly: true, expires: new Date(0) });
     res.cookie('refresh_token', '', { httpOnly: true, expires: new Date(0) });
     res.send();
