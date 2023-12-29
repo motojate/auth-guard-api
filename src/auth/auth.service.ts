@@ -82,9 +82,7 @@ export class AuthService {
   async verifyToken(token: string): Promise<any> {
     try {
       return await this.jwtService.verify(token);
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   }
 
   async OAuthLogin(googleOAuthUser: IOAuthGoogleUser) {
