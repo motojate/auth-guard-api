@@ -100,6 +100,5 @@ export class AuthController {
       req.cookies['access_token'],
     );
     if (token) throw new ExceptionsHandler();
-    console.log(token);
   }
 }
