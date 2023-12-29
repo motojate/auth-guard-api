@@ -98,7 +98,6 @@ export class UserService
       });
       return user;
     } catch (e) {
-      console.log(e);
       throw new PrismaException();
     }
   }
