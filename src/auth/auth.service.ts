@@ -8,6 +8,10 @@ import * as bcrypt from 'bcrypt';
 import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 import { decode } from 'jsonwebtoken';
+import {
+  InvalidTokenException,
+  NullTokenException,
+} from 'src/shared/exceptions/token.exception';
 @Injectable()
 export class AuthService {
   constructor(
@@ -94,8 +98,21 @@ export class AuthService {
   async verifyToken(token: string): Promise<any> {
     try {
       return await this.jwtService.verify(token);
+    } catch (e) {}
+  }
+
+  async verifyRefreshToken(token: string, userSeq: string) {
+    try {
+      const refreshToken = await this.prisma.refreshToken.findUnique({
+        where: {
+          token,
+          userSeq,
+        },
+      });
+      if (!refreshToken) throw new InvalidTokenException();
+      else return true;
     } catch (e) {
-      console.log(1);
+      throw new InvalidTokenException();
     }
   }
 
