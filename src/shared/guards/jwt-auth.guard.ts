@@ -22,10 +22,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     const request = context.switchToHttp().getRequest();
     const prisma = this.moduleRef.get(PrismaService, { strict: false });
     const accessToken = request.cookies['access_token'];
-
+    if (!accessToken) {
+      throw new NullTokenException();
+    }
     request.headers.authorization = `Bearer ${accessToken}`;
-    if (accessToken) request.headers.authorization = `Bearer ${accessToken}`;
-    else throw new NullTokenException();
 
     return from(
       prisma.tokenBlackList.findUnique({
