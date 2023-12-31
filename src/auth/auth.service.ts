@@ -7,7 +7,7 @@ import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
-
+import { decode } from 'jsonwebtoken';
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,6 +15,15 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
   ) {}
+
+  async decodeToken(token: string) {
+    try {
+      const decoded = decode(token, { complete: false });
+      return decoded;
+    } catch (e) {
+      return null;
+    }
+  }
 
   async createToken(user: User): Promise<string> {
     const payload = { userSeq: user.userSeq };
@@ -52,7 +61,10 @@ export class AuthService {
   }
 
   private async createRefreshToken(userSeq: string): Promise<string> {
-    const token = this.jwtService.sign({ seq: userSeq }, { expiresIn: '30d' });
+    const token = this.jwtService.sign(
+      { userSeq: userSeq },
+      { expiresIn: '30d' },
+    );
     await this.prisma.refreshToken.upsert({
       where: {
         userSeq: userSeq,
@@ -82,7 +94,9 @@ export class AuthService {
   async verifyToken(token: string): Promise<any> {
     try {
       return await this.jwtService.verify(token);
-    } catch (e) {}
+    } catch (e) {
+      console.log(1);
+    }
   }
 
   async OAuthLogin(googleOAuthUser: IOAuthGoogleUser) {

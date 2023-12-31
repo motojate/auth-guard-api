@@ -20,6 +20,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
+import { NullTokenException } from 'src/shared/exceptions/token.exception';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -94,11 +96,27 @@ export class AuthController {
   }
 
   @Get('jwt/check')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(JwtAuthGuard)
   async jwtCookieCheck(@Req() req: ExpressRequest) {
-    const token = await this.authService.verifyToken(
-      req.cookies['access_token'],
-    );
-    if (token) throw new ExceptionsHandler();
+    console.log(1);
+    console.log(req.cookies['access_token']);
+    // const token = await this.authService.verifyToken(
+    //   req.cookies['access_token'],
+    // );
+    //if (token) throw new NullTokenException();
+  }
+
+  @Get('refresh')
+  async refresh(@Req() req: ExpressRequest) {
+    const { access_token: accessToken, refresh_token: refreshToken } =
+      req.cookies;
+    if (!accessToken || !refreshToken) throw new NullTokenException();
+
+    const payload = await this.authService.decodeToken(accessToken);
+    console.log(payload['userSeq']);
+    // const token = await this.authService.verifyToken(
+    //   req.cookies['access_token'],
+    // );
+    //if (token) throw new NullTokenException();
   }
 }
