@@ -92,7 +92,7 @@ model EmailVerification {
 
 model RefreshToken {
   id        Int      @id @default(autoincrement())
-  token     String   @unique
+  token     String   @unique @db.VarChar(500)
   userSeq   String   @unique @map("user_seq")
   isRevoked Boolean  @default(false)
   createdAt DateTime @default(now()) @map("created_at")
@@ -125,7 +125,7 @@ model IpBlackList {
 
 model TokenBlackList {
   id    Int    @id @default(autoincrement())
-  token String @unique
+  token String @unique @db.VarChar(500)
 
   @@map("AT_MB_TOKEN_BLACK_LIST")
 }

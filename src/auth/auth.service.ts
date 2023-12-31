@@ -12,6 +12,7 @@ import {
   InvalidTokenException,
   NullTokenException,
 } from 'src/shared/exceptions/token.exception';
+import { PrismaException } from 'src/shared/exceptions/prisma.exception';
 @Injectable()
 export class AuthService {
   constructor(
@@ -127,6 +128,18 @@ export class AuthService {
     if (user) return user;
     else {
       return this.userService.createBySocial(dto);
+    }
+  }
+
+  async registBlackListToken(token: string) {
+    try {
+      await this.prisma.tokenBlackList.create({
+        data: {
+          token,
+        },
+      });
+    } catch (e) {
+      throw new PrismaException();
     }
   }
 }
