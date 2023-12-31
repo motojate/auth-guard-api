@@ -1,6 +1,10 @@
 type ResponseCodeType = 'SUCCESS' | 'EMPTY_DATA';
 type CommonErrorCodeType = 'BAD_REQUEST' | 'NETWORK_ERROR';
-type TokenErrorCodeType = 'NULL_TOKEN' | 'EXPIRED_TOKEN' | 'INVALID_TOKEN';
+type TokenErrorCodeType =
+  | 'NULL_TOKEN'
+  | 'EXPIRED_TOKEN'
+  | 'INVALID_TOKEN'
+  | 'BLACKLIST_TOKEN';
 type AuthErrorCodeType =
   | 'INVALID_USER'
   | 'IS_USED_CASE'
@@ -26,4 +30,5 @@ export const ERROR_CODES: { [key in ErrorCodeType]: number } = {
   NULL_TOKEN: 5000,
   INVALID_TOKEN: 5001,
   EXPIRED_TOKEN: 5002,
+  BLACKLIST_TOKEN: 5003,
 };
