@@ -20,7 +20,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
-import { NullTokenException } from 'src/shared/exceptions/token.exception';
+import {
+  InvalidTokenException,
+  NullTokenException,
+} from 'src/shared/exceptions/token.exception';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -107,16 +110,25 @@ export class AuthController {
   }
 
   @Get('refresh')
-  async refresh(@Req() req: ExpressRequest) {
+  async refresh(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
     const { access_token: accessToken, refresh_token: refreshToken } =
       req.cookies;
     if (!accessToken || !refreshToken) throw new NullTokenException();
 
     const payload = await this.authService.decodeToken(accessToken);
-    console.log(payload['userSeq']);
-    // const token = await this.authService.verifyToken(
-    //   req.cookies['access_token'],
-    // );
-    //if (token) throw new NullTokenException();
+    const userSeq = payload['userSeq'];
+    const isValidRefreshToken = await this.authService.verifyRefreshToken(
+      refreshToken,
+      userSeq,
+    );
+    if (!isValidRefreshToken) throw new InvalidTokenException();
+    const tokens = await this.authService.login(userSeq);
+    res.cookie('access_token', tokens.access_token, {
+      httpOnly: true,
+    });
+    res.cookie('refresh_token', tokens.refresh_token, {
+      httpOnly: true,
+    });
+    res.send();
   }
 }
