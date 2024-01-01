@@ -12,7 +12,7 @@ import { JwtGoogleStrategy } from './jwt-social-google.strategy';
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '30m' },
+      signOptions: { expiresIn: '1m' },
     }),
     UserModule,
     EmailVerificationModule,

@@ -23,6 +23,7 @@ export class UserService
     {
       userSeq: string;
       userId: string;
+      name: string;
       password: string;
       status: $Enums.Status;
       authProvider: $Enums.AuthProvider;
@@ -36,6 +37,7 @@ export class UserService
     filter: QueryFilter<{
       userSeq: string;
       userId: string;
+      name: string;
       password: string;
       status: $Enums.Status;
       authProvider: $Enums.AuthProvider;
@@ -46,6 +48,7 @@ export class UserService
     {
       userSeq: string;
       userId: string;
+      name: string;
       password: string;
       status: $Enums.Status;
       authProvider: $Enums.AuthProvider;
@@ -61,6 +64,7 @@ export class UserService
   ): Promise<{
     userSeq: string;
     userId: string;
+    name: string;
     password: string;
     status: $Enums.Status;
     authProvider: $Enums.AuthProvider;
@@ -72,6 +76,7 @@ export class UserService
   delete(id: string | number): Promise<{
     userSeq: string;
     userId: string;
+    name: string;
     password: string;
     status: $Enums.Status;
     authProvider: $Enums.AuthProvider;
@@ -177,6 +182,22 @@ export class UserService
               password: true,
             },
           },
+        },
+      });
+
+      return user;
+    } catch (e) {
+      throw new PrismaException();
+    }
+  }
+
+  async findUserInfo(userSeq: string) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { userSeq },
+        select: {
+          name: true,
+          userId: true,
         },
       });
 

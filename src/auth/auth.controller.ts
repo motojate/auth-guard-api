@@ -19,7 +19,6 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 import {
   InvalidTokenException,
   NullTokenException,
@@ -99,8 +98,6 @@ export class AuthController {
   @Get('jwt/check')
   @UseGuards(JwtAuthGuard)
   async jwtCookieCheck(@Req() req: ExpressRequest) {
-    console.log(1);
-    console.log(req.cookies['access_token']);
     // const token = await this.authService.verifyToken(
     //   req.cookies['access_token'],
     // );
