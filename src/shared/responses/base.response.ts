@@ -1,10 +1,7 @@
 import { RESPONSE_CODES } from '../utils/response.util';
 
 export class BaseResponse<T> {
-  constructor(
-    public result: T | T[],
-    public code: number, // HTTP 성공 상태 코드
-  ) {}
+  constructor(public result: T | T[], public code: number) {}
 
   static success<T>(
     data: T | T[],
