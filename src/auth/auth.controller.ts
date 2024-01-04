@@ -97,7 +97,7 @@ export class AuthController {
 
   @Get('jwt/check')
   @UseGuards(JwtAuthGuard)
-  async jwtCookieCheck(@Req() req: ExpressRequest) {
+  async jwtCookieCheck() {
     return true;
   }
 
