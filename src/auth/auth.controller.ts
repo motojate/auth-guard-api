@@ -98,10 +98,7 @@ export class AuthController {
   @Get('jwt/check')
   @UseGuards(JwtAuthGuard)
   async jwtCookieCheck(@Req() req: ExpressRequest) {
-    // const token = await this.authService.verifyToken(
-    //   req.cookies['access_token'],
-    // );
-    //if (token) throw new NullTokenException();
+    return true;
   }
 
   @Get('refresh')
