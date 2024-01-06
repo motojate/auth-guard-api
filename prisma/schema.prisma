@@ -66,11 +66,11 @@ model Site {
 
 model UserSiteMapping {
   seq          String       @id @unique @default(uuid())
-  userSeq      String       @map("user_seq")
+  userSeq      String       @unique @map("user_seq")
   userId       String       @map("user_id")
   siteName     SiteType     @map("site_name")
   authProvider AuthProvider @default(LOCAL) @map("auth_provider")
-  user         User         @relation(fields: [userSeq], references: [userSeq])
+  user         User         @relation(fields: [userSeq], references: [userSeq], onDelete: Cascade)
   site         Site         @relation(fields: [siteName], references: [name])
 
   @@unique([userId, siteName, authProvider], name: "siteUserId")

@@ -1,5 +1,7 @@
+import { Observable } from 'rxjs';
+
 export interface CreateService<T, CreateDto> {
-  create(dto: CreateDto): Promise<T>;
+  create(dto: CreateDto): Observable<T>;
 }
 
 export interface ReadService<T> {

@@ -14,6 +14,7 @@ import {
 } from 'src/shared/interfaces/factory.interface';
 import { LoginAuthDto, LoginAuthWithSocialDto } from 'src/auth/dtos/auth.dto';
 import axios from 'axios';
+import { from, mergeMap, throwError, catchError, Observable, map } from 'rxjs';
 
 @Injectable()
 export class UserService
@@ -87,29 +88,40 @@ export class UserService
     throw new Error('Method not implemented.');
   }
 
-  async create(dto: SignUpMemberUserDto) {
-    try {
-      const hashedPassword = await generateHashedPassword(dto.password);
-      const user = await this.prisma.user.create({
-        data: {
-          userId: dto.userId,
-          password: hashedPassword,
-          sites: {
-            create: {
-              userId: dto.userId,
-              siteName: dto.siteType,
+  create(dto: SignUpMemberUserDto): any {
+    return from(generateHashedPassword(dto.password)).pipe(
+      mergeMap((hashedPassword) =>
+        this.prisma.user.create({
+          data: {
+            userId: dto.userId,
+            password: hashedPassword,
+            sites: {
+              create: {
+                userId: dto.userId,
+                siteName: dto.siteType,
+              },
             },
           },
-        },
-      });
-      await axios.post('http://localhost:3500/api/user/sign-up', {
-        userSeq: user.userSeq,
-      });
+        }),
+      ),
+      mergeMap((user) =>
+        from(
+          axios.post('http://localhost:3500/api/user/sign-up', {
+            uesrSeq: user.userSeq,
+          }),
+        ).pipe(
+          map(() => user),
+          catchError(() => this.handleUserCreationError(user.userSeq)),
+        ),
+      ),
+      catchError(() => throwError(() => new PrismaException())),
+    );
+  }
 
-      return user;
-    } catch (e) {
-      throw new PrismaException();
-    }
+  private handleUserCreationError(userSeq: string): Observable<never> {
+    return from(this.prisma.user.delete({ where: { userSeq } })).pipe(
+      mergeMap(() => throwError(() => new PrismaException())),
+    );
   }
 
   async createBySocial(dto: SignUpSocialUserDto) {
