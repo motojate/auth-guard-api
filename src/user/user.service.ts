@@ -13,6 +13,7 @@ import {
   QueryFilter,
 } from 'src/shared/interfaces/factory.interface';
 import { LoginAuthDto, LoginAuthWithSocialDto } from 'src/auth/dtos/auth.dto';
+import axios from 'axios';
 
 @Injectable()
 export class UserService
@@ -101,6 +102,10 @@ export class UserService
           },
         },
       });
+      await axios.post('http://localhost:3500/api/user/sign-up', {
+        userSeq: user.userSeq,
+      });
+
       return user;
     } catch (e) {
       throw new PrismaException();
