@@ -90,7 +90,7 @@ export class UserService
 
   create(dto: SignUpMemberUserDto): any {
     return from(generateHashedPassword(dto.password)).pipe(
-      mergeMap((hashedPassword) =>
+      map((hashedPassword) =>
         this.prisma.user.create({
           data: {
             userId: dto.userId,
@@ -103,16 +103,6 @@ export class UserService
             },
           },
         }),
-      ),
-      mergeMap((user) =>
-        from(
-          axios.post('http://localhost:3500/api/user/sign-up', {
-            uesrSeq: user.userSeq,
-          }),
-        ).pipe(
-          map(() => user),
-          catchError(() => this.handleUserCreationError(user.userSeq)),
-        ),
       ),
       catchError(() => throwError(() => new PrismaException())),
     );
