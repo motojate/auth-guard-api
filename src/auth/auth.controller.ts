@@ -97,8 +97,11 @@ export class AuthController {
 
   @Get('jwt/check')
   @UseGuards(JwtAuthGuard)
-  async jwtCookieCheck() {
-    return true;
+  async jwtCookieCheck(@Req() req: ExpressRequest) {
+    const { access_token: accessToken } = req.cookies;
+    const payload = await this.authService.decodeToken(accessToken);
+    const userSeq = payload['userSeq'];
+    return userSeq;
   }
 
   @Get('refresh')
