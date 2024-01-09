@@ -4,6 +4,7 @@ import { User } from '@prisma/client';
 import {
   BlackListTokenException,
   ExpiredTokenException,
+  InvalidTokenException,
   NullTokenException,
 } from '../exceptions/token.exception';
 import { PrismaService } from '../prisma/prisma.service';
@@ -51,6 +52,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (!user) {
       if (info && info.name === 'TokenExpiredError')
         throw new ExpiredTokenException();
+      else if (info && info.name === 'JsonWebTokenError')
+        throw new InvalidTokenException();
     }
 
     return super.handleRequest(err, user, info, context);
