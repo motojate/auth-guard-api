@@ -85,13 +85,13 @@ export class AuthController {
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
     switch (user.authProvider) {
       case 'LOCAL':
-        res.redirect('http://localhost:3000');
+      //res.redirect('http://localhost:3000');
       case 'KAKAO':
-        res.redirect('http://localhost:3000');
+      //res.redirect('http://localhost:3000');
       case 'NAVER':
-        res.redirect('http://localhost:3000');
+      //res.redirect('http://localhost:3000');
       case 'GOOGLE':
-        res.redirect('http://localhost:3000');
+      //res.redirect('http://localhost:3000');
     }
   }
 
