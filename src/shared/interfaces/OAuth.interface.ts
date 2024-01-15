@@ -1,4 +1,4 @@
-import { AuthProvider, SiteType } from '@prisma/client';
+import { SiteType } from '@prisma/client';
 
 export interface PayloadInterface {
   userSeq: string;

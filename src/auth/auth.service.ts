@@ -13,6 +13,7 @@ import {
   NullTokenException,
 } from 'src/shared/exceptions/token.exception';
 import { PrismaException } from 'src/shared/exceptions/prisma.exception';
+import { Observable, catchError, from, map, throwError } from 'rxjs';
 @Injectable()
 export class AuthService {
   constructor(
@@ -97,9 +98,7 @@ export class AuthService {
   }
 
   async verifyToken(token: string): Promise<any> {
-    try {
-      return await this.jwtService.verify(token);
-    } catch (e) {}
+    return await this.jwtService.verify(token);
   }
 
   async verifyRefreshToken(token: string, userSeq: string) {
@@ -141,5 +140,21 @@ export class AuthService {
     } catch (e) {
       throw new PrismaException();
     }
+  }
+
+  findBlackListToken(token: string): Observable<boolean> {
+    return from(
+      this.prisma.tokenBlackList.findUnique({
+        where: {
+          token,
+        },
+      }),
+    ).pipe(
+      map((token) => {
+        if (token) return true;
+        else return false;
+      }),
+      catchError(() => throwError(() => new PrismaException())),
+    );
   }
 }

@@ -42,9 +42,7 @@ enum AuthProvider {
 model User {
   userSeq           String             @id @unique @default(uuid()) @map("user_seq")
   userId            String             @map("user_id")
-  name              String?
   password          String?
-  status            Status             @default(Y)
   authProvider      AuthProvider       @default(LOCAL) @map("auth_provider")
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @updatedAt @map("updated_at")

@@ -9,6 +9,7 @@ import {
   Req,
   Res,
   Query,
+  Put,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dtos/auth.dto';
@@ -24,6 +25,7 @@ import {
   NullTokenException,
 } from 'src/shared/exceptions/token.exception';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -95,10 +97,12 @@ export class AuthController {
     }
   }
 
-  @Get('jwt/check')
-  @UseGuards(JwtAuthGuard)
-  async jwtCookieCheck(@Req() req: ExpressRequest) {
+  @Post('jwt/check')
+  @UseGuards(JwtBodyAuthGuard)
+  async jwtCookieCheck(@Req() req: ExpressRequest, @Body('tokens') body: any) {
+    console.log(body);
     const { access_token: accessToken } = req.cookies;
+    console.log(accessToken);
     const payload = await this.authService.decodeToken(accessToken);
     const userSeq = payload['userSeq'];
     return userSeq;

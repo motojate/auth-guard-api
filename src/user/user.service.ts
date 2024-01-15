@@ -197,20 +197,4 @@ export class UserService
       throw new PrismaException();
     }
   }
-
-  async findUserInfo(userSeq: string) {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { userSeq },
-        select: {
-          name: true,
-          userId: true,
-        },
-      });
-
-      return user;
-    } catch (e) {
-      throw new PrismaException();
-    }
-  }
 }
