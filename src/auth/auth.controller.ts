@@ -100,9 +100,8 @@ export class AuthController {
   @Post('jwt/check')
   @UseGuards(JwtBodyAuthGuard)
   async jwtCookieCheck(@Req() req: ExpressRequest, @Body('tokens') body: any) {
-    console.log(body);
     const { access_token: accessToken } = req.cookies;
-    console.log(accessToken);
+
     const payload = await this.authService.decodeToken(accessToken);
     const userSeq = payload['userSeq'];
     return userSeq;
