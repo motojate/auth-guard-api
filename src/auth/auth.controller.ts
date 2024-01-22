@@ -101,11 +101,10 @@ export class AuthController {
   @UseGuards(JwtBodyAuthGuard)
   async jwtCookieCheck(
     @Body('tokens') body: { accessToken: string; refreshToekn: string },
-  ) {
+  ): Promise<string> {
     const { accessToken } = body;
-
     const payload = await this.authService.decodeToken(accessToken);
-    const userSeq = payload['userSeq'];
+    const userSeq: string = payload['userSeq'];
     return userSeq;
   }
 

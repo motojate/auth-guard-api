@@ -21,7 +21,7 @@ export class JwtBodyAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const tokens: HeaderToken = request.body.tokens;
-    if (!tokens.accessToken) throw new NullTokenException();
+    if (!tokens?.accessToken) throw new NullTokenException();
 
     return this.authService.findBlackListToken(tokens.accessToken).pipe(
       switchMap((isBlackList) => {
