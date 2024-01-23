@@ -9,7 +9,6 @@ import {
   Req,
   Res,
   Query,
-  Put,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dtos/auth.dto';
@@ -24,7 +23,6 @@ import {
   InvalidTokenException,
   NullTokenException,
 } from 'src/shared/exceptions/token.exception';
-import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
 
 @Controller('auth')
@@ -38,7 +36,7 @@ export class AuthController {
     @Response() res: ExpressResponse,
   ) {
     const user = await this.authService.validateUser(loginAuthDto);
-    const tokens = await this.authService.login(user.userSeq);
+    const tokens = await this.authService.login(user.user.userSeq);
     res.cookie('access_token', tokens.access_token, {
       httpOnly: true,
     });
@@ -81,20 +79,11 @@ export class AuthController {
     @Response() res: ExpressResponse,
   ) {
     const googleOAuthUser = req.user;
-    const user = await this.authService.OAuthLogin(googleOAuthUser);
-    const tokens = await this.authService.login(user.userSeq);
+    const tokens = await this.authService.OAuthLogin(googleOAuthUser);
+
     res.cookie('access_token', tokens.access_token, { httpOnly: true });
     res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
-    switch (user.authProvider) {
-      case 'LOCAL':
-      //res.redirect('http://localhost:3000');
-      case 'KAKAO':
-      //res.redirect('http://localhost:3000');
-      case 'NAVER':
-      //res.redirect('http://localhost:3000');
-      case 'GOOGLE':
-      //res.redirect('http://localhost:3000');
-    }
+    res.redirect('http://localhost:3000');
   }
 
   @Post('jwt/check')

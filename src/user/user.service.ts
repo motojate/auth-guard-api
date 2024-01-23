@@ -12,8 +12,7 @@ import {
   CrudService,
   QueryFilter,
 } from 'src/shared/interfaces/factory.interface';
-import { LoginAuthDto, LoginAuthWithSocialDto } from 'src/auth/dtos/auth.dto';
-import axios from 'axios';
+import { LoginAuthWithSocialDto } from 'src/auth/dtos/auth.dto';
 import { from, mergeMap, throwError, catchError, Observable, map } from 'rxjs';
 
 @Injectable()
@@ -97,7 +96,6 @@ export class UserService
             password: hashedPassword,
             sites: {
               create: {
-                userId: dto.userId,
                 siteName: dto.siteType,
               },
             },
@@ -120,12 +118,10 @@ export class UserService
         data: {
           userId: dto.userId,
           password: null,
-          authProvider: dto.loginProvider,
           sites: {
             create: {
-              userId: dto.userId,
-              siteName: dto.siteType,
               authProvider: dto.loginProvider,
+              siteName: dto.siteType,
             },
           },
         },
@@ -146,38 +142,13 @@ export class UserService
     }
   }
 
-  async findUniqueByUserIdAndSiteType(dto: LoginAuthWithSocialDto) {
-    try {
-      const user = await this.prisma.userSiteMapping.findUnique({
-        where: {
-          siteUserId: {
-            userId: dto.userId,
-            siteName: dto.siteType,
-            authProvider: dto.loginProvider,
-          },
-        },
-        include: {
-          user: {
-            select: {
-              password: true,
-            },
-          },
-        },
-      });
-
-      return user;
-    } catch (e) {
-      throw new PrismaException();
-    }
-  }
-
   async findUniqueByUserIdAndSiteTypeAndAuthProvider(
     dto: LoginAuthWithSocialDto,
   ) {
     try {
       const user = await this.prisma.userSiteMapping.findUnique({
         where: {
-          siteUserId: {
+          userSiteAuthProvider: {
             userId: dto.userId,
             siteName: dto.siteType,
             authProvider: dto.loginProvider,
@@ -187,6 +158,7 @@ export class UserService
           user: {
             select: {
               password: true,
+              userSeq: true,
             },
           },
         },

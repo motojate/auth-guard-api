@@ -9,10 +9,13 @@ type AuthErrorCodeType =
   | 'INVALID_USER'
   | 'IS_USED_CASE'
   | 'INVALID_CREDENTIALS';
+type UnknownErrorCodeType = 'UNKNOWN_ERROR';
+
 type ErrorCodeType =
   | CommonErrorCodeType
   | AuthErrorCodeType
-  | TokenErrorCodeType;
+  | TokenErrorCodeType
+  | UnknownErrorCodeType;
 
 export const RESPONSE_CODES: { [key in ResponseCodeType]: number } = {
   SUCCESS: 1000,
@@ -31,4 +34,6 @@ export const ERROR_CODES: { [key in ErrorCodeType]: number } = {
   INVALID_TOKEN: 5001,
   EXPIRED_TOKEN: 5002,
   BLACKLIST_TOKEN: 5003,
+
+  UNKNOWN_ERROR: 9000,
 };

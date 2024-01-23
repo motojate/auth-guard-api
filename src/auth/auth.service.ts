@@ -8,10 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 import { decode } from 'jsonwebtoken';
-import {
-  InvalidTokenException,
-  NullTokenException,
-} from 'src/shared/exceptions/token.exception';
+import { InvalidTokenException } from 'src/shared/exceptions/token.exception';
 import { PrismaException } from 'src/shared/exceptions/prisma.exception';
 import { Observable, catchError, from, map, throwError } from 'rxjs';
 @Injectable()
@@ -42,7 +39,8 @@ export class AuthService {
       userId: loginAuthDto.userId,
       siteType: loginAuthDto.siteType,
     };
-    const user = await this.userService.findUniqueByUserIdAndSiteType(dto);
+    const user =
+      await this.userService.findUniqueByUserIdAndSiteTypeAndAuthProvider(dto);
     if (!user) throw new InvalidUserException();
 
     const isValidPassword = await bcrypt.compare(
@@ -123,11 +121,12 @@ export class AuthService {
       loginProvider: 'GOOGLE',
     };
 
-    const user = await this.userService.findUniqueByUserIdAndSiteType(dto);
-    if (user) return user;
-    else {
-      return this.userService.createBySocial(dto);
-    }
+    const user =
+      await this.userService.findUniqueByUserIdAndSiteTypeAndAuthProvider(dto);
+    const loginDto = user
+      ? user.user.userSeq
+      : (await this.userService.createBySocial(dto)).userSeq;
+    return this.login(loginDto);
   }
 
   async registBlackListToken(token: string) {

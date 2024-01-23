@@ -43,7 +43,6 @@ model User {
   userSeq           String             @id @unique @default(uuid()) @map("user_seq")
   userId            String             @map("user_id")
   password          String?
-  authProvider      AuthProvider       @default(LOCAL) @map("auth_provider")
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @updatedAt @map("updated_at")
   refreshToken      RefreshToken?
@@ -64,14 +63,13 @@ model Site {
 
 model UserSiteMapping {
   seq          String       @id @unique @default(uuid())
-  userSeq      String       @unique @map("user_seq")
   userId       String       @map("user_id")
   siteName     SiteType     @map("site_name")
   authProvider AuthProvider @default(LOCAL) @map("auth_provider")
-  user         User         @relation(fields: [userSeq], references: [userSeq], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [userSeq], onDelete: Cascade)
   site         Site         @relation(fields: [siteName], references: [name])
 
-  @@unique([userId, siteName, authProvider], name: "siteUserId")
+  @@unique([userId, siteName, authProvider], name: "userSiteAuthProvider")
   @@map("AT_MB_USER_SITE_MAPPING")
 }
 

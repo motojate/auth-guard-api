@@ -1,14 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { BadRequestExceptionFilter } from './shared/filters/http-exception.filter';
+import { GlobalHttpExceptionFilter } from './shared/filters/http-exception.filter';
 import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.useGlobalFilters(new BadRequestExceptionFilter());
+  app.useGlobalFilters(new GlobalHttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

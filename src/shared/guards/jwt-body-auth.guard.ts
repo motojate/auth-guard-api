@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { HeaderToken } from '../interfaces/common.interface';
 import {
   BlackListTokenException,
@@ -21,6 +15,8 @@ export class JwtBodyAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const tokens: HeaderToken = request.body.tokens;
+    console.log(tokens);
+    console.log(request.body);
     if (!tokens?.accessToken) throw new NullTokenException();
 
     return this.authService.findBlackListToken(tokens.accessToken).pipe(
