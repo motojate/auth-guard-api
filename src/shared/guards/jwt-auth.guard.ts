@@ -6,8 +6,8 @@ import {
   ExpiredTokenException,
   InvalidTokenException,
   NullTokenException,
-} from '../exceptions/token.exception';
-import { PrismaService } from '../prisma/prisma.service';
+} from 'src/shared/exceptions/token.exception';
+import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { ModuleRef } from '@nestjs/core';
 import { Observable, catchError, from, switchMap, throwError } from 'rxjs';
 

@@ -1,145 +1,101 @@
 import { Injectable } from '@nestjs/common';
-import {
-  SignUpMemberUserDto,
-  SignUpSocialUserDto,
-  UpdateMemberUserDto,
-} from './dtos/user.dto';
+import { SignUpMemberUserDto, SignUpSocialUserDto } from './dtos/user.dto';
 import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { PrismaException } from 'src/shared/exceptions/prisma.exception';
-import { $Enums, User } from '@prisma/client';
+
 import {
-  CrudService,
-  QueryFilter,
-} from 'src/shared/interfaces/factory.interface';
-import { LoginAuthWithSocialDto } from 'src/auth/dtos/auth.dto';
-import { from, mergeMap, throwError, catchError, Observable, map } from 'rxjs';
+  BaseLoginAuthDto,
+  LoginAuthWithSocialDto,
+} from 'src/auth/dtos/auth.dto';
+import { from, throwError, catchError, map } from 'rxjs';
+import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 
 @Injectable()
-export class UserService
-  implements CrudService<User, SignUpMemberUserDto, UpdateMemberUserDto>
-{
+export class UserService {
   constructor(private readonly prisma: PrismaService) {}
-  findAll(): Promise<
-    {
-      userSeq: string;
-      userId: string;
-      name: string;
-      password: string;
-      status: $Enums.Status;
-      authProvider: $Enums.AuthProvider;
-      createdAt: Date;
-      updatedAt: Date;
-    }[]
-  > {
-    throw new Error('Method not implemented.');
-  }
-  findByFilter(
-    filter: QueryFilter<{
-      userSeq: string;
-      userId: string;
-      name: string;
-      password: string;
-      status: $Enums.Status;
-      authProvider: $Enums.AuthProvider;
-      createdAt: Date;
-      updatedAt: Date;
-    }>,
-  ): Promise<
-    {
-      userSeq: string;
-      userId: string;
-      name: string;
-      password: string;
-      status: $Enums.Status;
-      authProvider: $Enums.AuthProvider;
-      createdAt: Date;
-      updatedAt: Date;
-    }[]
-  > {
-    throw new Error('Method not implemented.');
-  }
-  update(
-    id: string | number,
-    dto: UpdateMemberUserDto,
-  ): Promise<{
-    userSeq: string;
-    userId: string;
-    name: string;
-    password: string;
-    status: $Enums.Status;
-    authProvider: $Enums.AuthProvider;
-    createdAt: Date;
-    updatedAt: Date;
-  }> {
-    throw new Error('Method not implemented.');
-  }
-  delete(id: string | number): Promise<{
-    userSeq: string;
-    userId: string;
-    name: string;
-    password: string;
-    status: $Enums.Status;
-    authProvider: $Enums.AuthProvider;
-    createdAt: Date;
-    updatedAt: Date;
-  }> {
-    throw new Error('Method not implemented.');
-  }
 
   create(dto: SignUpMemberUserDto): any {
     return from(generateHashedPassword(dto.password)).pipe(
       map((hashedPassword) =>
         this.prisma.user.create({
           data: {
-            userId: dto.userId,
             password: hashedPassword,
             sites: {
               create: {
+                userId: dto.userId,
                 siteName: dto.siteType,
               },
             },
           },
         }),
       ),
-      catchError(() => throwError(() => new PrismaException())),
+      catchError((e) => throwError(() => new PrismaException(e))),
     );
   }
 
-  private handleUserCreationError(userSeq: string): Observable<never> {
-    return from(this.prisma.user.delete({ where: { userSeq } })).pipe(
-      mergeMap(() => throwError(() => new PrismaException())),
-    );
-  }
-
-  async createBySocial(dto: SignUpSocialUserDto) {
-    try {
-      const user = await this.prisma.user.create({
+  createBySocial(dto: SignUpSocialUserDto) {
+    return from(
+      this.prisma.user.create({
         data: {
-          userId: dto.userId,
           password: null,
           sites: {
             create: {
+              userId: dto.userId,
               authProvider: dto.loginProvider,
               siteName: dto.siteType,
             },
           },
         },
-      });
-      return user;
-    } catch (e) {
-      throw new PrismaException();
-    }
+      }),
+    ).pipe(
+      map((user) => user.userSeq),
+      catchError((e) => throwError(() => new PrismaException(e))),
+    );
   }
 
-  // async createWithSocial()
+  findByUserForLogin(dto: BaseLoginAuthDto) {
+    return from(
+      this.prisma.userSiteMapping.findUnique({
+        where: {
+          userSiteAuthProvider: {
+            userId: dto.userId,
+            siteName: dto.siteType,
+            authProvider: dto.loginProvider,
+          },
+        },
+        include: {
+          user: {
+            select: {
+              password: true,
+            },
+          },
+        },
+      }),
+    ).pipe(
+      map((user) => {
+        if (!user && user.authProvider === 'LOCAL')
+          throwError(() => new InvalidUserException());
+        return user;
+      }),
+      catchError((e) => throwError(() => new PrismaException(e))),
+    );
+  }
 
-  async findUnique(userSeq: string) {
-    try {
-      return await this.prisma.user.findUnique({ where: { userSeq: userSeq } });
-    } catch (e) {
-      throw new PrismaException();
-    }
+  findUnique(userSeq: string) {
+    return from(
+      this.prisma.user.findUnique({
+        where: {
+          userSeq,
+        },
+      }),
+    ).pipe(
+      map((user) => {
+        if (!user) throw new InvalidUserException();
+        return user;
+      }),
+      catchError((e) => throwError(() => new PrismaException(e))),
+    );
   }
 
   async findUniqueByUserIdAndSiteTypeAndAuthProvider(
@@ -166,7 +122,7 @@ export class UserService
 
       return user;
     } catch (e) {
-      throw new PrismaException();
+      throw new PrismaException(e);
     }
   }
 }

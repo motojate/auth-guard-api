@@ -3,11 +3,7 @@ import { BaseException } from './base.exception';
 import { ERROR_CODES } from '../utils/response.util';
 
 export class PrismaException extends BaseException {
-  constructor() {
-    super(
-      ERROR_CODES.NETWORK_ERROR,
-      'NETWORK_ERROR',
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
+  constructor(err: any) {
+    super(ERROR_CODES.NETWORK_ERROR, err, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

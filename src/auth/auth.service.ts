@@ -1,6 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
@@ -10,7 +9,16 @@ import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 import { decode } from 'jsonwebtoken';
 import { InvalidTokenException } from 'src/shared/exceptions/token.exception';
 import { PrismaException } from 'src/shared/exceptions/prisma.exception';
-import { Observable, catchError, from, map, throwError } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  from,
+  map,
+  mergeMap,
+  of,
+  throwError,
+} from 'rxjs';
+import { ValidateUserInfo } from 'src/shared/interfaces/common.interface';
 @Injectable()
 export class AuthService {
   constructor(
@@ -28,60 +36,59 @@ export class AuthService {
     }
   }
 
-  async createToken(user: User): Promise<string> {
-    const payload = { userSeq: user.userSeq };
-    return this.jwtService.sign(payload);
+  private createToken(userSeq: string, option?: { expiresIn: string }) {
+    const payload = { userSeq };
+    return this.jwtService.sign(payload, option);
   }
 
-  async validateUser(loginAuthDto: LoginAuthDto) {
-    const dto: LoginAuthWithSocialDto = {
-      loginProvider: loginAuthDto.loginProvider,
-      userId: loginAuthDto.userId,
-      siteType: loginAuthDto.siteType,
-    };
-    const user =
-      await this.userService.findUniqueByUserIdAndSiteTypeAndAuthProvider(dto);
-    if (!user) throw new InvalidUserException();
-
-    const isValidPassword = await bcrypt.compare(
-      loginAuthDto.password,
-      user.user.password,
+  private getNewLoginTokens(userSeq: string) {
+    return this.createRefreshToken(userSeq).pipe(
+      map((refreshToken) => {
+        const accessToken = this.createToken(userSeq);
+        return { access_token: accessToken, refresh_token: refreshToken };
+      }),
     );
-    if (!isValidPassword) {
-      throw new UnauthorizedException('Invalid password');
-    }
-    return user;
   }
 
-  async login(userSeq: string) {
-    const payload = {
-      userSeq: userSeq,
-    };
-    const refreshToken = await this.createRefreshToken(userSeq);
-    return {
-      access_token: this.jwtService.sign(payload),
-      refresh_token: refreshToken,
-    };
-  }
-
-  private async createRefreshToken(userSeq: string): Promise<string> {
-    const token = this.jwtService.sign(
-      { userSeq: userSeq },
-      { expiresIn: '30d' },
+  private validateUser(loginAuthDto: LoginAuthDto) {
+    const { password, ...dto } = loginAuthDto;
+    return this.userService.findByUserForLogin(dto).pipe(
+      mergeMap((data) => {
+        return from(bcrypt.compare(password, data.user.password)).pipe(
+          map((isValidPassword) => {
+            if (!isValidPassword) throw new InvalidUserException();
+            else return data.userSeq;
+          }),
+        );
+      }),
     );
-    await this.prisma.refreshToken.upsert({
-      where: {
-        userSeq: userSeq,
-      },
-      create: {
-        token,
-        userSeq,
-      },
-      update: {
-        token,
-      },
-    });
-    return token;
+  }
+
+  login(dto: LoginAuthDto) {
+    return this.validateUser(dto).pipe(
+      mergeMap((userSeq) => this.getNewLoginTokens(userSeq)),
+    );
+  }
+
+  private createRefreshToken(userSeq: string) {
+    const token = this.createToken(userSeq, { expiresIn: '30d' });
+    return from(
+      this.prisma.refreshToken.upsert({
+        where: {
+          userSeq: userSeq,
+        },
+        create: {
+          token,
+          userSeq,
+        },
+        update: {
+          token,
+        },
+      }),
+    ).pipe(
+      map((refreshToken) => refreshToken.token),
+      catchError((e) => throwError(() => new PrismaException(e))),
+    );
   }
 
   async findRefreshToken(token: string) {
@@ -95,8 +102,8 @@ export class AuthService {
     });
   }
 
-  async verifyToken(token: string): Promise<any> {
-    return await this.jwtService.verify(token);
+  verifyToken(token: string) {
+    return this.jwtService.verify<ValidateUserInfo>(token);
   }
 
   async verifyRefreshToken(token: string, userSeq: string) {
@@ -114,31 +121,28 @@ export class AuthService {
     }
   }
 
-  async OAuthLogin(googleOAuthUser: IOAuthGoogleUser) {
+  OAuthLogin(googleOAuthUser: IOAuthGoogleUser) {
     const dto: LoginAuthWithSocialDto = {
       userId: googleOAuthUser.email,
       siteType: googleOAuthUser.site,
       loginProvider: 'GOOGLE',
     };
-
-    const user =
-      await this.userService.findUniqueByUserIdAndSiteTypeAndAuthProvider(dto);
-    const loginDto = user
-      ? user.user.userSeq
-      : (await this.userService.createBySocial(dto)).userSeq;
-    return this.login(loginDto);
+    return this.userService.findByUserForLogin(dto).pipe(
+      mergeMap((user) =>
+        user ? of(user.userSeq) : this.userService.createBySocial(dto),
+      ),
+      mergeMap((userSeq) => this.getNewLoginTokens(userSeq)),
+    );
   }
 
-  async registBlackListToken(token: string) {
-    try {
-      await this.prisma.tokenBlackList.create({
+  registBlackListToken(token: string) {
+    return from(
+      this.prisma.tokenBlackList.create({
         data: {
           token,
         },
-      });
-    } catch (e) {
-      throw new PrismaException();
-    }
+      }),
+    ).pipe(catchError((e) => throwError(() => new PrismaException(e))));
   }
 
   findBlackListToken(token: string): Observable<boolean> {
@@ -153,7 +157,7 @@ export class AuthService {
         if (token) return true;
         else return false;
       }),
-      catchError(() => throwError(() => new PrismaException())),
+      catchError((e) => throwError(() => new PrismaException(e))),
     );
   }
 }

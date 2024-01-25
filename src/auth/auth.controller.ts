@@ -18,32 +18,40 @@ import {
 } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
-import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
+import {
+  AuthenticatedRequest,
+  IOAuthGoogleUser,
+} from 'src/shared/interfaces/OAuth.interface';
 import {
   InvalidTokenException,
   NullTokenException,
 } from 'src/shared/exceptions/token.exception';
 import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { map } from 'rxjs';
+import { BaseResponse } from 'src/shared/responses/base.response';
+import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @HttpCode(201)
+  @HttpCode(200)
   async login(
     @Body() loginAuthDto: LoginAuthDto,
     @Response() res: ExpressResponse,
   ) {
-    const user = await this.authService.validateUser(loginAuthDto);
-    const tokens = await this.authService.login(user.user.userSeq);
-    res.cookie('access_token', tokens.access_token, {
-      httpOnly: true,
-    });
-    res.cookie('refresh_token', tokens.refresh_token, {
-      httpOnly: true,
-    });
-    res.send();
+    return this.authService.login(loginAuthDto).pipe(
+      map((tokens) => {
+        res.cookie('access_token', tokens.access_token, { httpOnly: true });
+        res.cookie('refresh_token', tokens.refresh_token, {
+          httpOnly: true,
+        });
+        const response = BaseResponse.success(null);
+        res.json(response);
+      }),
+    );
   }
 
   @Post('logout')
@@ -79,22 +87,24 @@ export class AuthController {
     @Response() res: ExpressResponse,
   ) {
     const googleOAuthUser = req.user;
-    const tokens = await this.authService.OAuthLogin(googleOAuthUser);
-
-    res.cookie('access_token', tokens.access_token, { httpOnly: true });
-    res.cookie('refresh_token', tokens.refresh_token, { httpOnly: true });
-    res.redirect('http://localhost:3000');
+    return this.authService.OAuthLogin(googleOAuthUser).pipe(
+      map((tokens) => {
+        res.cookie('access_token', tokens.access_token, { httpOnly: true });
+        res.cookie('refresh_token', tokens.refresh_token, {
+          httpOnly: true,
+        });
+        const response = BaseResponse.success(null);
+        res.json(response);
+        res.redirect('http://localhost:3000');
+      }),
+    );
   }
 
   @Post('jwt/check')
   @UseGuards(JwtBodyAuthGuard)
-  async jwtCookieCheck(
-    @Body('tokens') body: { accessToken: string; refreshToekn: string },
-  ): Promise<string> {
-    const { accessToken } = body;
-    const payload = await this.authService.decodeToken(accessToken);
-    const userSeq: string = payload['userSeq'];
-    return userSeq;
+  async jwtCookieCheck(@Req() req: AuthenticatedRequest): Promise<string> {
+    console.log(req.user);
+    return req.user.userSeq;
   }
 
   @Get('refresh')
@@ -102,21 +112,22 @@ export class AuthController {
     const { access_token: accessToken, refresh_token: refreshToken } =
       req.cookies;
     if (!accessToken || !refreshToken) throw new NullTokenException();
-
-    const payload = await this.authService.decodeToken(accessToken);
-    const userSeq = payload['userSeq'];
-    const isValidRefreshToken = await this.authService.verifyRefreshToken(
-      refreshToken,
-      userSeq,
-    );
-    if (!isValidRefreshToken) throw new InvalidTokenException();
-    const tokens = await this.authService.login(userSeq);
-    res.cookie('access_token', tokens.access_token, {
-      httpOnly: true,
-    });
-    res.cookie('refresh_token', tokens.refresh_token, {
-      httpOnly: true,
-    });
-    res.send();
+    if (!req.user) throw new InvalidUserException();
+    console.log(1, req.user);
+    // const payload = await this.authService.decodeToken(req.user);
+    // const userSeq = payload['userSeq'];
+    // const isValidRefreshToken = await this.authService.verifyRefreshToken(
+    //   refreshToken,
+    //   userSeq,
+    // );
+    // if (!isValidRefreshToken) throw new InvalidTokenException();
+    // const tokens = await this.authService.login(userSeq);
+    // res.cookie('access_token', tokens.access_token, {
+    //   httpOnly: true,
+    // });
+    // res.cookie('refresh_token', tokens.refresh_token, {
+    //   httpOnly: true,
+    // });
+    // res.send();
   }
 }

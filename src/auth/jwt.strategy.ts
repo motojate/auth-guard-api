@@ -1,17 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { AuthService } from './auth.service';
+import { firstValueFrom, map } from 'rxjs';
 import { PayloadInterface } from 'src/shared/interfaces/OAuth.interface';
+import { ValidateUserInfo } from 'src/shared/interfaces/common.interface';
 import { UserService } from 'src/user/user.service';
-import { InvalidTokenException } from 'src/shared/exceptions/token.exception';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly userService: UserService,
-  ) {
+  constructor(private readonly userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -19,9 +16,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: PayloadInterface) {
-    const user = await this.userService.findUnique(payload.userSeq);
-    if (!user) throw new InvalidTokenException();
-    return user.userId;
+  async validate(payload: PayloadInterface): Promise<ValidateUserInfo> {
+    const user = await firstValueFrom(
+      this.userService.findUnique(payload.userSeq),
+    );
+    return {
+      userSeq: user.userSeq,
+    };
   }
 }

@@ -2,7 +2,7 @@ import { AuthProvider, SiteType } from '@prisma/client';
 import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 import { SITE_DATA, SOCIAL_DATA } from 'src/shared/constants/db.constant';
 
-class BaseLoginAuthDto {
+export class BaseLoginAuthDto {
   @IsString()
   @IsNotEmpty()
   readonly userId: string;
