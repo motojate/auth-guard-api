@@ -20,6 +20,16 @@ export class ExpiredTokenException extends BaseException {
   }
 }
 
+export class ExpiredRefreshTokenException extends BaseException {
+  constructor() {
+    super(
+      ERROR_CODES.EXPIRED_REFRESH_TOKEN,
+      'EXPIRED_REFRESH_TOKEN',
+      HttpStatus.UNAUTHORIZED,
+    );
+  }
+}
+
 export class BlackListTokenException extends BaseException {
   constructor() {
     super(ERROR_CODES.BLACKLIST_TOKEN, 'BLACKLIST_TOKEN', HttpStatus.FORBIDDEN);

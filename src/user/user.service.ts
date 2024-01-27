@@ -94,7 +94,10 @@ export class UserService {
         if (!user) throw new InvalidUserException();
         return user;
       }),
-      catchError((e) => throwError(() => new PrismaException(e))),
+      catchError((e) => {
+        console.log(e);
+        return throwError(() => new PrismaException(e));
+      }),
     );
   }
 

@@ -8,10 +8,14 @@ import {
 } from 'src/shared/exceptions/token.exception';
 import { AuthService } from 'src/auth/auth.service';
 import { Observable, catchError, map, mergeMap, of, throwError } from 'rxjs';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class JwtBodyAuthGuard implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
   canActivate(context: ExecutionContext): Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const tokens: HeaderToken = request.body.tokens;
@@ -23,9 +27,14 @@ export class JwtBodyAuthGuard implements CanActivate {
         if (isBlackList) throw new BlackListTokenException();
         return of(this.authService.verifyToken(tokens.accessToken));
       }),
-      map((payload) => {
-        request.user = payload;
-        return true;
+      mergeMap((payload) => {
+        return this.userService.findUnique(payload.userSeq).pipe(
+          map((user) => {
+            if (!user) throw new InvalidTokenException();
+            request.user = payload;
+            return true;
+          }),
+        );
       }),
       catchError((err) => {
         switch (err.name) {

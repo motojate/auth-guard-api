@@ -22,15 +22,9 @@ import {
   AuthenticatedRequest,
   IOAuthGoogleUser,
 } from 'src/shared/interfaces/OAuth.interface';
-import {
-  InvalidTokenException,
-  NullTokenException,
-} from 'src/shared/exceptions/token.exception';
 import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
-import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { map } from 'rxjs';
 import { BaseResponse } from 'src/shared/responses/base.response';
-import { InvalidUserException } from 'src/shared/exceptions/user.exception';
 
 @Controller('auth')
 export class AuthController {
@@ -38,10 +32,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  async login(
-    @Body() loginAuthDto: LoginAuthDto,
-    @Response() res: ExpressResponse,
-  ) {
+  login(@Body() loginAuthDto: LoginAuthDto, @Response() res: ExpressResponse) {
     return this.authService.login(loginAuthDto).pipe(
       map((tokens) => {
         res.cookie('access_token', tokens.access_token, { httpOnly: true });
@@ -70,10 +61,7 @@ export class AuthController {
   }
 
   @Get('login/google')
-  async loginGoogle(
-    @Query('site') site: SiteType,
-    @Res() res: ExpressResponse,
-  ) {
+  loginGoogle(@Query('site') site: SiteType, @Res() res: ExpressResponse) {
     const state = encodeURIComponent(JSON.stringify({ site }));
     const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_CALLBACK_URL}&scope=email profile&state=${state}`;
     res.redirect(url);
@@ -82,7 +70,7 @@ export class AuthController {
   @Get('google/callback')
   @HttpCode(201)
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(
+  googleAuthRedirect(
     @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
     @Response() res: ExpressResponse,
   ) {
@@ -102,25 +90,15 @@ export class AuthController {
 
   @Post('jwt/check')
   @UseGuards(JwtBodyAuthGuard)
-  async jwtCookieCheck(@Req() req: AuthenticatedRequest): Promise<string> {
-    console.log(req.user);
+  jwtCookieCheck(@Req() req: AuthenticatedRequest): string {
     return req.user.userSeq;
   }
 
   @Get('refresh')
-  async refresh(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
-    const { access_token: accessToken, refresh_token: refreshToken } =
-      req.cookies;
-    if (!accessToken || !refreshToken) throw new NullTokenException();
-    if (!req.user) throw new InvalidUserException();
-    console.log(1, req.user);
-    // const payload = await this.authService.decodeToken(req.user);
-    // const userSeq = payload['userSeq'];
-    // const isValidRefreshToken = await this.authService.verifyRefreshToken(
-    //   refreshToken,
-    //   userSeq,
-    // );
-    // if (!isValidRefreshToken) throw new InvalidTokenException();
+  refresh(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
+    const { refresh_token: refreshToken } = req.cookies;
+
+    return this.authService.verifyRefreshToken(refreshToken);
     // const tokens = await this.authService.login(userSeq);
     // res.cookie('access_token', tokens.access_token, {
     //   httpOnly: true,

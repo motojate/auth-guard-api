@@ -106,19 +106,17 @@ export class AuthService {
     return this.jwtService.verify<ValidateUserInfo>(token);
   }
 
-  async verifyRefreshToken(token: string, userSeq: string) {
-    try {
-      const refreshToken = await this.prisma.refreshToken.findUnique({
-        where: {
-          token,
-          userSeq,
-        },
-      });
-      if (!refreshToken) throw new InvalidTokenException();
-      else return true;
-    } catch (e) {
-      throw new InvalidTokenException();
-    }
+  verifyRefreshToken(token: string) {
+    return of(this.verifyToken(token)).pipe(
+      mergeMap((payload) => {
+        return from(
+          this.prisma.refreshToken.findUnique({
+            where: { userSeq: payload.userSeq },
+          }),
+        ).pipe(map((data) => data));
+      }),
+      catchError((e) => e),
+    );
   }
 
   OAuthLogin(googleOAuthUser: IOAuthGoogleUser) {

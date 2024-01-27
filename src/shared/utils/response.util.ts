@@ -4,7 +4,8 @@ type TokenErrorCodeType =
   | 'NULL_TOKEN'
   | 'EXPIRED_TOKEN'
   | 'INVALID_TOKEN'
-  | 'BLACKLIST_TOKEN';
+  | 'BLACKLIST_TOKEN'
+  | 'EXPIRED_REFRESH_TOKEN';
 type AuthErrorCodeType =
   | 'INVALID_USER'
   | 'IS_USED_CASE'
@@ -34,6 +35,7 @@ export const ERROR_CODES: { [key in ErrorCodeType]: number } = {
   INVALID_TOKEN: 5001,
   EXPIRED_TOKEN: 5002,
   BLACKLIST_TOKEN: 5003,
+  EXPIRED_REFRESH_TOKEN: 5004,
 
   UNKNOWN_ERROR: 9000,
 };
