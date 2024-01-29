@@ -19,6 +19,7 @@ import {
   throwError,
 } from 'rxjs';
 import { ValidateUserInfo } from 'src/shared/interfaces/common.interface';
+import { Prisma } from '@prisma/client';
 @Injectable()
 export class AuthService {
   constructor(
