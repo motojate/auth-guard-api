@@ -89,17 +89,15 @@ export class AuthController {
   }
 
   @Get('refresh')
-  refresh(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
+  async refresh(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
     const { refresh_token: refreshToken } = req.cookies;
-
-    // return this.authService.verifyRefreshToken(refreshToken);
-    // const tokens = await this.authService.login(userSeq);
-    // res.cookie('access_token', tokens.access_token, {
-    //   httpOnly: true,
-    // });
-    // res.cookie('refresh_token', tokens.refresh_token, {
-    //   httpOnly: true,
-    // });
-    // res.send();
+    const tokens = await this.authService.refreshToken(refreshToken);
+    res.cookie('access_token', tokens.accessToken, {
+      httpOnly: true,
+    });
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+    });
+    res.send();
   }
 }

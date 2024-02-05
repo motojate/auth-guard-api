@@ -11,6 +11,7 @@ import {
   ValidateUserInfo,
 } from 'src/shared/interfaces/common.interface';
 import { RedisCacheService } from 'src/shared/redis/redis-cache.service';
+import { ExpiredRefreshTokenException } from 'src/shared/exceptions/token.exception';
 
 @Injectable()
 export class AuthService {
@@ -53,7 +54,7 @@ export class AuthService {
     return token;
   }
 
-  verifyToken(token: string) {
+  async verifyToken(token: string) {
     return this.jwtService.verify<ValidateUserInfo>(token);
   }
 
@@ -64,5 +65,22 @@ export class AuthService {
       loginProvider: 'GOOGLE',
     };
     return 1;
+  }
+
+  async refreshToken(token: string): Promise<HeaderToken> {
+    const payload = await this.verifyToken(token);
+    const redisToken = await this.redisService.get<string>(
+      `refresh-token:${payload.userSeq}`,
+    );
+    console.log(redisToken);
+    if (redisToken !== token) throw new ExpiredRefreshTokenException();
+    const [accessToken, refreshToken] = await Promise.all([
+      this.createToken(payload.userSeq),
+      this.createRefreshToken(payload.userSeq),
+    ]);
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

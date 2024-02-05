@@ -12,7 +12,7 @@ import { RedisCacheModule } from 'src/shared/redis/redis-cache.module';
   imports: [
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '30m' },
+      signOptions: { expiresIn: '1m' },
     }),
     UserModule,
     EmailVerificationModule,

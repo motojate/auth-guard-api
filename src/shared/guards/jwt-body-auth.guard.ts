@@ -7,7 +7,15 @@ import {
   NullTokenException,
 } from 'src/shared/exceptions/token.exception';
 import { AuthService } from 'src/auth/auth.service';
-import { Observable, catchError, map, mergeMap, of, throwError } from 'rxjs';
+import {
+  Observable,
+  catchError,
+  from,
+  map,
+  mergeMap,
+  of,
+  throwError,
+} from 'rxjs';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -22,7 +30,7 @@ export class JwtBodyAuthGuard implements CanActivate {
 
     if (!tokens?.accessToken) throw new NullTokenException();
 
-    return of(this.authService.verifyToken(tokens.accessToken)).pipe(
+    return from(this.authService.verifyToken(tokens.accessToken)).pipe(
       mergeMap((payload) => {
         return this.userService.findUnique(payload.userSeq).pipe(
           map((user) => {
