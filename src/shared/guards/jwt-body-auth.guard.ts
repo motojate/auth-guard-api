@@ -22,11 +22,7 @@ export class JwtBodyAuthGuard implements CanActivate {
 
     if (!tokens?.accessToken) throw new NullTokenException();
 
-    return this.authService.findBlackListToken(tokens.accessToken).pipe(
-      mergeMap((isBlackList) => {
-        if (isBlackList) throw new BlackListTokenException();
-        return of(this.authService.verifyToken(tokens.accessToken));
-      }),
+    return of(this.authService.verifyToken(tokens.accessToken)).pipe(
       mergeMap((payload) => {
         return this.userService.findUnique(payload.userSeq).pipe(
           map((user) => {

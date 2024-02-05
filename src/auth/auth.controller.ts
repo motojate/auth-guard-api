@@ -31,18 +31,17 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @HttpCode(200)
-  login(@Body() loginAuthDto: LoginAuthDto, @Response() res: ExpressResponse) {
-    return this.authService.login(loginAuthDto).pipe(
-      map((tokens) => {
-        res.cookie('access_token', tokens.access_token, { httpOnly: true });
-        res.cookie('refresh_token', tokens.refresh_token, {
-          httpOnly: true,
-        });
-        const response = BaseResponse.success(null);
-        res.json(response);
-      }),
-    );
+  @HttpCode(201)
+  async login(
+    @Body() loginAuthDto: LoginAuthDto,
+    @Response() res: ExpressResponse,
+  ) {
+    const tokens = await this.authService.login(loginAuthDto);
+    res.cookie('access_token', tokens.accessToken, { httpOnly: true });
+    res.cookie('refresh_token', tokens.refreshToken, {
+      httpOnly: true,
+    });
+    res.send();
   }
 
   @Post('logout')
@@ -50,11 +49,6 @@ export class AuthController {
   async logout(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
     const { access_token: accessToken, refresh_token: refreshToken } =
       req.cookies;
-    if (accessToken && refreshToken)
-      await Promise.all([
-        this.authService.registBlackListToken(accessToken),
-        this.authService.registBlackListToken(refreshToken),
-      ]);
     res.cookie('access_token', '', { httpOnly: true, expires: new Date(0) });
     res.cookie('refresh_token', '', { httpOnly: true, expires: new Date(0) });
     res.send();
@@ -67,26 +61,26 @@ export class AuthController {
     res.redirect(url);
   }
 
-  @Get('google/callback')
-  @HttpCode(201)
-  @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(
-    @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
-    @Response() res: ExpressResponse,
-  ) {
-    const googleOAuthUser = req.user;
-    return this.authService.OAuthLogin(googleOAuthUser).pipe(
-      map((tokens) => {
-        res.cookie('access_token', tokens.access_token, { httpOnly: true });
-        res.cookie('refresh_token', tokens.refresh_token, {
-          httpOnly: true,
-        });
-        const response = BaseResponse.success(null);
-        res.json(response);
-        res.redirect('http://localhost:3000');
-      }),
-    );
-  }
+  // @Get('google/callback')
+  // @HttpCode(201)
+  // @UseGuards(AuthGuard('google'))
+  // googleAuthRedirect(
+  //   @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
+  //   @Response() res: ExpressResponse,
+  // ) {
+  //   const googleOAuthUser = req.user;
+  //   return this.authService.OAuthLogin(googleOAuthUser).pipe(
+  //     map((tokens) => {
+  //       res.cookie('access_token', tokens.access_token, { httpOnly: true });
+  //       res.cookie('refresh_token', tokens.refresh_token, {
+  //         httpOnly: true,
+  //       });
+  //       const response = BaseResponse.success(null);
+  //       res.json(response);
+  //       res.redirect('http://localhost:3000');
+  //     }),
+  //   );
+  // }
 
   @Post('jwt/check')
   @UseGuards(JwtBodyAuthGuard)
@@ -98,7 +92,7 @@ export class AuthController {
   refresh(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
     const { refresh_token: refreshToken } = req.cookies;
 
-    return this.authService.verifyRefreshToken(refreshToken);
+    // return this.authService.verifyRefreshToken(refreshToken);
     // const tokens = await this.authService.login(userSeq);
     // res.cookie('access_token', tokens.access_token, {
     //   httpOnly: true,

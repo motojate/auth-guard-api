@@ -25,6 +25,7 @@ export class UserService {
               create: {
                 userId: dto.userId,
                 siteName: dto.siteType,
+                authProvider: 'LOCAL',
               },
             },
           },
@@ -54,32 +55,25 @@ export class UserService {
     );
   }
 
-  findByUserForLogin(dto: BaseLoginAuthDto) {
-    return from(
-      this.prisma.userSiteMapping.findUnique({
-        where: {
-          userSiteAuthProvider: {
-            userId: dto.userId,
-            siteName: dto.siteType,
-            authProvider: dto.loginProvider,
+  async findByUserForLogin(dto: BaseLoginAuthDto) {
+    const user = await this.prisma.userSiteMapping.findUnique({
+      where: {
+        userSiteAuthProvider: {
+          userId: dto.userId,
+          siteName: dto.siteType,
+          authProvider: dto.loginProvider,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            password: true,
           },
         },
-        include: {
-          user: {
-            select: {
-              password: true,
-            },
-          },
-        },
-      }),
-    ).pipe(
-      map((user) => {
-        if (!user && user.authProvider === 'LOCAL')
-          throwError(() => new InvalidUserException());
-        return user;
-      }),
-      catchError((e) => throwError(() => new PrismaException(e))),
-    );
+      },
+    });
+    if (!user) throw new InvalidUserException();
+    return user;
   }
 
   findUnique(userSeq: string) {
