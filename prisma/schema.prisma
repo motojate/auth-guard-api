@@ -44,7 +44,6 @@ model User {
   password          String?
   createdAt         DateTime           @default(now()) @map("created_at")
   updatedAt         DateTime           @updatedAt @map("updated_at")
-  refreshToken      RefreshToken?
   emailVerification EmailVerification?
   sites             UserSiteMapping[]
 
@@ -81,22 +80,9 @@ model EmailVerification {
   validTime  DateTime @map("valid_time")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userSeq], references: [userSeq])
+  user       User     @relation(fields: [userSeq], references: [userSeq])
 
   @@map("AT_MB_EMAIL_VERIFICATION")
-}
-
-model RefreshToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique @db.VarChar(500)
-  userSeq   String   @unique @map("user_seq")
-  isRevoked Boolean  @default(false)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  user      User     @relation(fields: [userSeq], references: [userSeq])
-
-  @@map("AT_MB_REFRESH_TOKEN")
 }
 
 model Message {
