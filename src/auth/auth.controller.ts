@@ -25,6 +25,7 @@ import {
 import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
 import { map } from 'rxjs';
 import { BaseResponse } from 'src/shared/responses/base.response';
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -82,9 +83,15 @@ export class AuthController {
   //   );
   // }
 
+  @Get('jwt/check')
+  @UseGuards(JwtAuthGuard)
+  getJwtCookieCheck(@Req() req: AuthenticatedRequest): string {
+    return req.user.userSeq;
+  }
+
   @Post('jwt/check')
   @UseGuards(JwtBodyAuthGuard)
-  jwtCookieCheck(@Req() req: AuthenticatedRequest): string {
+  postJwtCookieCheck(@Req() req: AuthenticatedRequest): string {
     return req.user.userSeq;
   }
 
