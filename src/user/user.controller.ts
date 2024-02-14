@@ -6,12 +6,6 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get()
-  test() {
-    this.userService.test();
-    return 1;
-  }
-
   // @EventPattern('create_user')
   async signUp(@Payload() singUpMemberUser: SignUpMemberUserDto) {
     console.log('동작한다');

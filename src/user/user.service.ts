@@ -19,15 +19,6 @@ export class UserService {
     private readonly prisma: PrismaService,
   ) {}
 
-  test() {
-    const testDto = {
-      userId: 'motojate99913@naver.com',
-      password: 'qwer1234',
-      siteType: 'MYEONJEOB_BOKKA',
-    };
-    this.userClient.emit('create_user', testDto);
-  }
-
   create(dto: SignUpMemberUserDto): any {
     return from(generateHashedPassword(dto.password)).pipe(
       map((hashedPassword) =>
