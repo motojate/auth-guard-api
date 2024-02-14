@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
@@ -72,7 +72,7 @@ export class AuthService {
     const redisToken = await this.redisService.get<string>(
       `refresh-token:${payload.userSeq}`,
     );
-    console.log(redisToken);
+
     if (redisToken !== token) throw new ExpiredRefreshTokenException();
     const [accessToken, refreshToken] = await Promise.all([
       this.createToken(payload.userSeq),

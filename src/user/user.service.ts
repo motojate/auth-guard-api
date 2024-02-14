@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { SignUpMemberUserDto, SignUpSocialUserDto } from './dtos/user.dto';
 import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
@@ -10,10 +10,23 @@ import {
 } from 'src/auth/dtos/auth.dto';
 import { from, throwError, catchError, map } from 'rxjs';
 import { InvalidUserException } from 'src/shared/exceptions/user.exception';
+import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject('USER_MICROSERVICE') private readonly userClient: ClientKafka,
+    private readonly prisma: PrismaService,
+  ) {}
+
+  test() {
+    const testDto = {
+      userId: 'motojate99913@naver.com',
+      password: 'qwer1234',
+      siteType: 'MYEONJEOB_BOKKA',
+    };
+    this.userClient.emit('create_user', testDto);
+  }
 
   create(dto: SignUpMemberUserDto): any {
     return from(generateHashedPassword(dto.password)).pipe(

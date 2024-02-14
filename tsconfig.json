@@ -16,6 +16,9 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@nestjs-microservices/shared/dto": ["libs/shared/src/lib/dto/index.ts"]
+    }
   }
 }

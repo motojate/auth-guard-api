@@ -7,6 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { UserModule } from 'src/user/user.module';
 import { JwtGoogleStrategy } from './jwt-social-google.strategy';
 import { RedisCacheModule } from 'src/shared/redis/redis-cache.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
