@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { PayloadInterface } from 'src/shared/interfaces/OAuth.interface';
 import { ValidateUserInfo } from 'src/shared/interfaces/common.interface';
 import { UserService } from 'src/user/user.service';

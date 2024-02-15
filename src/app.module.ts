@@ -7,8 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisCacheModule } from './shared/redis/redis-cache.module';
-import { KafkaModule } from './kafka/kafka.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+
 @Module({
   imports: [
     RedisModule.forRootAsync({

@@ -12,10 +12,10 @@ async function bootstrap() {
     transport: Transport.KAFKA,
     options: {
       client: {
-        brokers: ['127.0.0.1:9092'], // Kafka 설정 파일의 listeners에 정의된 주소
+        brokers: ['127.0.0.1:9092'],
       },
       consumer: {
-        groupId: 'user_consumer', // 컨슈머 그룹 ID, 고유하게 설정
+        groupId: 'user_consumer',
       },
     },
   });
