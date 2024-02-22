@@ -12,8 +12,8 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '1000m' },
+      secret: process.env.JWT_PRIVATE_SECRET,
+      signOptions: { algorithm: 'RS256', expiresIn: '1000m' },
     }),
     UserModule,
     EmailVerificationModule,

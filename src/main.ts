@@ -31,13 +31,13 @@ async function bootstrap() {
       },
     }),
   );
-  app.use(
-    session({
-      secret: process.env.JWT_SECRET,
-      resave: false,
-      saveUninitialized: false,
-    }),
-  );
+  // app.use(
+  //   session({
+  //     secret: process.env.JWT_PRIVATE_SECRET,
+  //     resave: false,
+  //     saveUninitialized: false,
+  //   }),
+  // );
   app.use(cookieParser());
   app.enableCors({
     origin: 'http://localhost:3000',
