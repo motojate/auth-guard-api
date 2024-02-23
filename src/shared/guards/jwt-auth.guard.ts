@@ -10,6 +10,7 @@ import {
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { ModuleRef } from '@nestjs/core';
 import { Observable, catchError, from, switchMap, throwError } from 'rxjs';
+import { HeaderToken } from '../interfaces/common.interface';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -22,7 +23,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const prisma = this.moduleRef.get(PrismaService, { strict: false });
-    const accessToken = request.cookies['access_token'];
+    const tokens: HeaderToken = request.body.tokens;
+
+    const accessToken = tokens.accessToken;
     if (!accessToken) {
       throw new NullTokenException();
     }

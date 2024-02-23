@@ -11,7 +11,7 @@ import { RedisCacheModule } from 'src/shared/redis/redis-cache.module';
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.JWT_PRIVATE_SECRET,
+      privateKey: process.env.JWT_PRIVATE_SECRET,
       signOptions: { algorithm: 'RS256', expiresIn: '1000m' },
     }),
     UserModule,

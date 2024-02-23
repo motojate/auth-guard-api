@@ -7,15 +7,7 @@ import {
   NullTokenException,
 } from 'src/shared/exceptions/token.exception';
 import { AuthService } from 'src/auth/auth.service';
-import {
-  Observable,
-  catchError,
-  from,
-  map,
-  mergeMap,
-  of,
-  throwError,
-} from 'rxjs';
+import { Observable, catchError, from, map, mergeMap, throwError } from 'rxjs';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
