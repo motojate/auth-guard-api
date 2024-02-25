@@ -16,15 +16,9 @@ import {
   Response as ExpressResponse,
   Request as ExpressRequest,
 } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 import { SiteType } from '@prisma/client';
-import {
-  AuthenticatedRequest,
-  IOAuthGoogleUser,
-} from 'src/shared/interfaces/OAuth.interface';
+import { AuthenticatedRequest } from 'src/shared/interfaces/OAuth.interface';
 import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
-import { map } from 'rxjs';
-import { BaseResponse } from 'src/shared/responses/base.response';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 
 @Controller('auth')
