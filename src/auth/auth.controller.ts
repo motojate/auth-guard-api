@@ -48,8 +48,6 @@ export class AuthController {
   @Post('logout')
   @HttpCode(201)
   async logout(@Req() req: ExpressRequest, @Response() res: ExpressResponse) {
-    const { access_token: accessToken, refresh_token: refreshToken } =
-      req.cookies;
     res.cookie('access_token', '', { httpOnly: true, expires: new Date(0) });
     res.cookie('refresh_token', '', { httpOnly: true, expires: new Date(0) });
     res.send();
