@@ -7,6 +7,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { UserModule } from 'src/user/user.module';
 import { JwtGoogleStrategy } from './jwt-social-google.strategy';
 import { RedisCacheModule } from 'src/shared/redis/redis-cache.module';
+import { LoginHandler } from './commands/login.hanler';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { RedisCacheModule } from 'src/shared/redis/redis-cache.module';
     EmailVerificationModule,
     RedisCacheModule,
   ],
-  providers: [AuthService, JwtStrategy, JwtGoogleStrategy],
+  providers: [AuthService, JwtStrategy, JwtGoogleStrategy, LoginHandler],
   controllers: [AuthController],
   exports: [AuthService, JwtModule, JwtGoogleStrategy, JwtStrategy],
 })
