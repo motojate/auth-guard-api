@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalHttpExceptionFilter } from './shared/filters/http-exception.filter';
-import * as session from 'express-session';
 import * as cookieParser from 'cookie-parser';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
@@ -31,13 +30,7 @@ async function bootstrap() {
       },
     }),
   );
-  // app.use(
-  //   session({
-  //     secret: process.env.JWT_PRIVATE_SECRET,
-  //     resave: false,
-  //     saveUninitialized: false,
-  //   }),
-  // );
+
   app.use(cookieParser());
   app.enableCors({
     origin: 'http://localhost:3000',
