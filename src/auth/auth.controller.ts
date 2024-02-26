@@ -20,10 +20,15 @@ import { SiteType } from '@prisma/client';
 import { AuthenticatedRequest } from 'src/shared/interfaces/OAuth.interface';
 import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { LoginCommand } from './commands/login.command';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly commandBus: CommandBus,
+  ) {}
 
   @Post('login')
   @HttpCode(201)
@@ -31,7 +36,9 @@ export class AuthController {
     @Body() loginAuthDto: LoginAuthDto,
     @Response() res: ExpressResponse,
   ) {
-    const tokens = await this.authService.login(loginAuthDto);
+    const tokens = await this.commandBus.execute(
+      new LoginCommand(loginAuthDto),
+    );
     res.cookie('access_token', tokens.accessToken, { httpOnly: true });
     res.cookie('refresh_token', tokens.refreshToken, {
       httpOnly: true,
