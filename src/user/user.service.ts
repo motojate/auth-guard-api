@@ -10,14 +10,10 @@ import {
 } from 'src/auth/dtos/auth.dto';
 import { from, throwError, catchError, map } from 'rxjs';
 import { InvalidUserException } from 'src/shared/exceptions/user.exception';
-import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject('USER_MICROSERVICE') private readonly userClient: ClientKafka,
-    private readonly prisma: PrismaService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   create(dto: SignUpMemberUserDto): any {
     return from(generateHashedPassword(dto.password)).pipe(
