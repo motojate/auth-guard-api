@@ -8,6 +8,7 @@ import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisCacheModule } from './shared/redis/redis-cache.module';
 import { CustomCqrsModule } from './shared/cqrs/custom-cqrs.module';
+import { KafkaModule } from './kafka/kafka.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CustomCqrsModule } from './shared/cqrs/custom-cqrs.module';
     UserModule,
     PrismaModule,
     AuthModule,
+    KafkaModule,
     RedisCacheModule,
     CustomCqrsModule,
   ],

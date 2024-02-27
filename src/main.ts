@@ -3,21 +3,10 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { GlobalHttpExceptionFilter } from './shared/filters/http-exception.filter';
 import * as cookieParser from 'cookie-parser';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.KAFKA,
-    options: {
-      client: {
-        brokers: ['127.0.0.1:9092'],
-      },
-      consumer: {
-        groupId: 'user_consumer',
-      },
-    },
-  });
+
   app.setGlobalPrefix('api');
   app.useGlobalFilters(new GlobalHttpExceptionFilter());
   app.useGlobalPipes(
@@ -38,7 +27,7 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Accept',
     credentials: true,
   });
-  // await app.startAllMicroservices();
+  await app.startAllMicroservices();
   await app.listen(3100);
 }
 bootstrap();
