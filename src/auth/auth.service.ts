@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { UserService } from 'src/user/user.service';
 import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
 import * as bcrypt from 'bcrypt';
 import { InvalidUserException } from 'src/shared/exceptions/user.exception';
@@ -12,14 +10,15 @@ import {
 } from 'src/shared/interfaces/common.interface';
 import { RedisCacheService } from 'src/shared/redis/redis-cache.service';
 import { ExpiredRefreshTokenException } from 'src/shared/exceptions/token.exception';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetUserQuery } from 'src/user/queries/get-user.query';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService,
-    private readonly userService: UserService,
     private readonly redisService: RedisCacheService,
+    private readonly queryBus: QueryBus,
   ) {}
 
   private createToken(userSeq: string, option?: { expiresIn: string }) {
@@ -29,7 +28,9 @@ export class AuthService {
 
   private async validateUser(loginAuthDto: LoginAuthDto): Promise<string> {
     const { password, ...dto } = loginAuthDto;
-    const user = await this.userService.findByUserForLogin(dto);
+    const user = await this.queryBus.execute(
+      new GetUserQuery(dto.userId, dto.siteType, dto.loginProvider),
+    );
     const isValidPassword = await bcrypt.compare(password, user.user.password);
     if (!isValidPassword) throw new InvalidUserException();
     return user.userSeq;

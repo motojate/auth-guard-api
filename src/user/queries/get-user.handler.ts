@@ -16,6 +16,13 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
           authProvider: query.authProvider,
         },
       },
+      include: {
+        user: {
+          select: {
+            password: true,
+          },
+        },
+      },
     });
   }
 }
