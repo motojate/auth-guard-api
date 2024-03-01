@@ -1,6 +1,9 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { SignUpMemberUserDto } from './dtos/user.dto';
+import {
+  CheckAvailabilityUserIdDto,
+  SignUpMemberUserDto,
+} from './dtos/user.dto';
 import { AuthProvider, SiteType } from '@prisma/client';
 import { GetValidUserIdQuery } from './queries/get-valid-user-id.query';
 import { QueryBus } from '@nestjs/cqrs';
@@ -18,13 +21,16 @@ export class UserController {
   }
 
   @Get('check/availability')
+  @HttpCode(200)
   async isavailAbilityUserId(
-    @Query('userId') userId: string,
-    @Query('siteName') siteName: SiteType,
-    @Query('authProvider') authProvider: AuthProvider,
+    @Query() checkAvailabilityUserIdDto: CheckAvailabilityUserIdDto,
   ) {
     return this.queryBus.execute(
-      new GetValidUserIdQuery(userId, siteName, authProvider),
+      new GetValidUserIdQuery(
+        checkAvailabilityUserIdDto.userId,
+        checkAvailabilityUserIdDto.siteName,
+        checkAvailabilityUserIdDto.authProvider,
+      ),
     );
   }
 }

@@ -1,5 +1,5 @@
 import { AuthProvider, SiteType } from '@prisma/client';
-import { IsEmpty, IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmpty, IsEnum, IsIn, IsNotEmpty, IsString } from 'class-validator';
 import { SITE_DATA, SOCIAL_DATA } from 'src/shared/constants/db.constant';
 
 export class FindMemberUserDto {
@@ -39,4 +39,17 @@ export class UpdateMemberUserDto {
   @IsString()
   @IsNotEmpty()
   readonly password: string;
+}
+
+export class CheckAvailabilityUserIdDto {
+  @IsNotEmpty()
+  readonly userId: string;
+
+  @IsNotEmpty()
+  @IsEnum(SiteType)
+  readonly siteName: SiteType;
+
+  @IsNotEmpty()
+  @IsEnum(AuthProvider)
+  readonly authProvider: AuthProvider;
 }
