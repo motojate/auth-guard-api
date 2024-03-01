@@ -17,6 +17,7 @@ export class GetValidUserIDHandler
         siteName: query.siteName,
       },
     });
+
     if (userConut > 0) throw new InUsedUserException();
     else return true;
   }

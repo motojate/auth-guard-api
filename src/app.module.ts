@@ -25,7 +25,7 @@ import { KafkaModule } from './kafka/kafka.module';
     UserModule,
     PrismaModule,
     AuthModule,
-    KafkaModule,
+    //KafkaModule,
     RedisCacheModule,
     CustomCqrsModule,
   ],
