@@ -112,3 +112,12 @@ model TokenBlackList {
 
   @@map("AT_MB_TOKEN_BLACK_LIST")
 }
+
+model LoginHistory {
+  id        Int      @id @default(autoincrement())
+  userSeq   String   @map("user_seq")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("AT_MB_LOGIN_HISTORY")
+}
