@@ -5,7 +5,6 @@ import {
   Body,
   Post,
   Get,
-  UseGuards,
   Req,
   Res,
   Query,
@@ -18,8 +17,6 @@ import {
 } from 'express';
 import { SiteType } from '@prisma/client';
 import { AuthenticatedRequest } from 'src/shared/interfaces/OAuth.interface';
-import { JwtBodyAuthGuard } from 'src/shared/guards/jwt-body-auth.guard';
-import { JwtAuthGuard } from 'src/shared/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { LoginCommand } from './commands/login.command';
 
@@ -83,13 +80,11 @@ export class AuthController {
   // }
 
   @Get('jwt/check')
-  @UseGuards(JwtAuthGuard)
   getJwtCookieCheck(@Req() req: AuthenticatedRequest): string {
     return req.user.userSeq;
   }
 
   @Post('jwt/check')
-  @UseGuards(JwtBodyAuthGuard)
   postJwtCookieCheck(@Req() req: AuthenticatedRequest): string {
     return req.user.userSeq;
   }
