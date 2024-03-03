@@ -10,8 +10,9 @@ import {
 } from 'src/shared/interfaces/common.interface';
 import { RedisCacheService } from 'src/shared/redis/redis-cache.service';
 import { ExpiredRefreshTokenException } from 'src/shared/exceptions/token.exception';
-import { QueryBus } from '@nestjs/cqrs';
+import { EventBus, QueryBus } from '@nestjs/cqrs';
 import { GetUserQuery } from 'src/user/queries/get-user.query';
+import { LoginEvent } from './events/login.event';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly redisService: RedisCacheService,
     private readonly queryBus: QueryBus,
+    private readonly eventBus: EventBus,
   ) {}
 
   private createToken(userSeq: string, option?: { expiresIn: string }) {
@@ -42,6 +44,7 @@ export class AuthService {
       this.createToken(userSeq),
       this.createRefreshToken(userSeq),
     ]);
+    await this.eventBus.publish(new LoginEvent(userSeq));
     return {
       accessToken,
       refreshToken,

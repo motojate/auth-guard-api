@@ -9,8 +9,6 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
 
   async execute(command: LoginCommand): Promise<HeaderToken> {
     const tokens = await this.authService.login(command);
-
-    // 로그인 히스토리 저장
     return tokens;
   }
 }
