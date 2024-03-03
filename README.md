@@ -1,75 +1,65 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# 개요
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+전역 universe 인증 서버
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+패턴 : CQRS 패턴 이용.
 
-## Description
+인증 방식 : JWT, RSA256, OpenSSL 비대칭 키, OAuth2
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+주요 api : 로그인, 소셜 로그인
 
 ## Installation
 
 ```bash
 $ yarn install
+$ yarn
 ```
 
 ## Running the app
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+$ yarn start
 ```
 
-## Test
+## Database Setting
+
+- 데이터베이스 : MariaDB
+- 환경 : 로컬
+
+## Database Init
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+$ yarn prisma db push
+$ yarn prisma db seed (초기 데이터 삽입)
 ```
 
-## Support
+## API Docs
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+공용 response
 
-## Stay in touch
+```jsonc
+{
+  "code": "정의한 코드 - number",
+  "result": "결과값 - 에러타입 혹은 반환값의 타입"
+}
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 응답 코드
 
-## License
+| Http-Status | Code | Description                     |
+| ----------- | ---- | ------------------------------- |
+| 200         | 1000 | 요청 성공                       |
+| 200         | 1001 | 요청은 성공했지만 데이터가 없음 |
 
-Nest is [MIT licensed](LICENSE).
-# auth-guard-api
-전역 auth 관련 api 서버
+### 에러 코드
+
+| Http-Status | Code | Description                       |
+| ----------- | ---- | --------------------------------- |
+| 400         | 2000 | 요청값 오류 - Bad Request         |
+| 500         | 2001 | 서버 에러 - Internal Server Error |
+| 401         | 3001 | 유효하지 않은 유저 정보           |
+| 401         | 3002 | 비밀번호 미일치                   |
+| 401         | 5000 | 토큰이 없는 경우                  |
+| 401         | 5001 | 유효하지 않은 토큰                |
+| 401         | 5002 | Jwt Access 토큰 만료              |
+| -           | 9000 | 정의되자 않은 에러 코드           |
