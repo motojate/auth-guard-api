@@ -40,49 +40,27 @@ enum AuthProvider {
 
 // MODEL 정의
 model User {
-  userSeq           String             @id @unique @default(uuid()) @map("user_seq")
-  password          String?
-  createdAt         DateTime           @default(now()) @map("created_at")
-  updatedAt         DateTime           @updatedAt @map("updated_at")
-  emailVerification EmailVerification?
-  sites             UserSiteMapping[]
+  userSeq      String       @id @unique @default(uuid()) @map("user_seq")
+  userId       String       @map("user_id")
+  password     String?
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  authProvider AuthProvider @default(LOCAL) @map("auth_provider")
+  siteType     SiteType     @map("site_type")
+  site         Site         @relation(fields: [siteType], references: [siteType])
 
+  @@unique([userId, siteType], name: "userIdSiteType")
   @@map("AT_MB_USER")
 }
 
 model Site {
-  name      SiteType          @id @unique
-  createdAt DateTime          @default(now()) @map("created_at")
-  updatedAt DateTime          @updatedAt @map("updated_at")
-  users     UserSiteMapping[]
+  siteType  SiteType @id @unique
+  name      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  users     User[]
 
   @@map("AT_MB_SITE")
-}
-
-model UserSiteMapping {
-  seq          String       @id @unique @default(uuid())
-  userSeq      String       @unique @map("user_seq")
-  userId       String       @map("user_id")
-  siteName     SiteType     @map("site_name")
-  authProvider AuthProvider @default(LOCAL) @map("auth_provider")
-  user         User         @relation(fields: [userSeq], references: [userSeq], onDelete: Cascade)
-  site         Site         @relation(fields: [siteName], references: [name])
-
-  @@unique([userId, siteName, authProvider], name: "userSiteAuthProvider")
-  @@map("AT_MB_USER_SITE_MAPPING")
-}
-
-model EmailVerification {
-  id         Int      @id @unique @default(autoincrement())
-  userSeq    String   @unique @map("user_seq")
-  userId     String   @map("user_id")
-  verifyCode String   @map("verify_code")
-  validTime  DateTime @map("valid_time")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-  user       User     @relation(fields: [userSeq], references: [userSeq])
-
-  @@map("AT_MB_EMAIL_VERIFICATION")
 }
 
 model Message {
