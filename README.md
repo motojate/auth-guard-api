@@ -8,6 +8,20 @@
 
 주요 api : 로그인, 소셜 로그인
 
+
+# PUBLIC_KEY
+```bash
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqYyk2zTmKafngo9o5mUF
+7wvmw6njNdo1tu0oSfC+MdSvgCv5bk8n+zjlBSQ7QAGskMWVTYpcvyrTJ98nxnWi
+R9AzAX5wwapx6nHM13BSnBsu1SRLozkEyQfx2tuj1D2MX0WdJYcGWBtSZBIYmPnY
+kpc1B+Le7NSPwh2kKBThC1vBlpUM3/zh0b/wYRW0P0wIKp3FCr0FsVfbHUgib2DR
+vZjh8teHZne2FZfGKjqWGJXYhAH6kHCbkyuk+l3o5z73qODxXGppHoht1rNYCctc
+nkIBtX2zGihl20qzEfNedQiyR2Unj2MTeCRN5xuB4kZNyCCVuPDZjbwg1ZcmNLkc
+zQIDAQAB
+-----END PUBLIC KEY-----
+```
+
 ## Installation
 
 ```bash
