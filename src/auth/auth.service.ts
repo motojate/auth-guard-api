@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
-import * as bcrypt from 'bcrypt';
-import { InvalidUserException } from 'src/shared/exceptions/user.exception';
+import {
+  LoginAuthDto,
+  LoginAuthWithPasswordDto,
+  LoginAuthWithSocialDto,
+} from './dtos/auth.dto';
 import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 import {
   HeaderToken,
@@ -11,8 +13,9 @@ import {
 import { RedisCacheService } from 'src/shared/redis/redis-cache.service';
 import { ExpiredRefreshTokenException } from 'src/shared/exceptions/token.exception';
 import { EventBus, QueryBus } from '@nestjs/cqrs';
-import { GetUserQuery } from 'src/user/queries/get-user.query';
 import { LoginEvent } from './events/login.event';
+import { LoginStrategyFactory } from './stategies/login-strategy.factory';
+import { LoginAuthDtoType } from './stategies/login-strategy.inteface';
 
 @Injectable()
 export class AuthService {
@@ -21,25 +24,25 @@ export class AuthService {
     private readonly redisService: RedisCacheService,
     private readonly queryBus: QueryBus,
     private readonly eventBus: EventBus,
+    private readonly loginStrategyFactory: LoginStrategyFactory,
   ) {}
 
   private createToken(userSeq: string, option?: { expiresIn: string }) {
     const payload = { userSeq };
-    return this.jwtService.sign(payload, option);
+    const token = this.jwtService.sign(payload, option);
+    return token;
   }
 
-  private async validateUser(loginAuthDto: LoginAuthDto): Promise<string> {
-    const { password, ...dto } = loginAuthDto;
-    const user = await this.queryBus.execute(
-      new GetUserQuery(dto.userId, dto.siteType, dto.loginProvider),
-    );
-    const isValidPassword = await bcrypt.compare(password, user.user.password);
-    if (!isValidPassword) throw new InvalidUserException();
-    return user.userSeq;
+  private async createRefreshToken(userSeq: string) {
+    const token = this.createToken(userSeq, { expiresIn: '30d' });
+    const ttl = 30 * 24 * 60 * 60;
+    await this.redisService.set<string>(`refresh-token:${userSeq}`, token, ttl);
+    return token;
   }
 
-  async login(dto: LoginAuthDto): Promise<HeaderToken> {
-    const userSeq = await this.validateUser(dto);
+  async login(dto: LoginAuthDtoType): Promise<HeaderToken> {
+    const strategy = this.loginStrategyFactory.getStrategy(dto);
+    const userSeq = await strategy.authenticate(dto);
     const [accessToken, refreshToken] = await Promise.all([
       this.createToken(userSeq),
       this.createRefreshToken(userSeq),
@@ -51,24 +54,17 @@ export class AuthService {
     };
   }
 
-  async createRefreshToken(userSeq: string) {
-    const token = this.createToken(userSeq, { expiresIn: '30d' });
-    const ttl = 30 * 24 * 60 * 60;
-    await this.redisService.set<string>(`refresh-token:${userSeq}`, token, ttl);
-    return token;
-  }
-
-  async verifyToken(token: string) {
-    return this.jwtService.verify<ValidateUserInfo>(token);
-  }
-
-  OAuthLogin(googleOAuthUser: IOAuthGoogleUser) {
+  async socialLogin(googleOAuthUser: IOAuthGoogleUser) {
     const dto: LoginAuthWithSocialDto = {
       userId: googleOAuthUser.email,
       siteType: googleOAuthUser.site,
       loginProvider: 'GOOGLE',
     };
     return 1;
+  }
+
+  async verifyToken(token: string) {
+    return this.jwtService.verify<ValidateUserInfo>(token);
   }
 
   async refreshToken(token: string): Promise<HeaderToken> {

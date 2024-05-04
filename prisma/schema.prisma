@@ -54,11 +54,12 @@ model User {
 }
 
 model Site {
-  siteType  SiteType @id @unique
-  name      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  users     User[]
+  siteType    SiteType @id @unique
+  name        String
+  redirectUrl String   @map("redirect_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  users       User[]
 
   @@map("AT_MB_SITE")
 }

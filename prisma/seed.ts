@@ -5,7 +5,11 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.site.createMany({
-    data: SITE_DATA,
+    data: SITE_DATA.map(({ siteType, name, redirectUrl }) => ({
+      siteType,
+      name,
+      redirectUrl,
+    })),
     skipDuplicates: true,
   });
 }

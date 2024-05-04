@@ -10,11 +10,11 @@ export class GetValidUserIDHandler
   constructor(private readonly prisma: PrismaService) {}
 
   async execute(query: GetValidUserIdQuery): Promise<boolean> {
-    const userConut = await this.prisma.userSiteMapping.count({
+    const userConut = await this.prisma.user.count({
       where: {
         userId: query.userId,
         authProvider: query.authProvider,
-        siteName: query.siteName,
+        siteType: query.siteName,
       },
     });
 

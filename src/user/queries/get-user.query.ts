@@ -1,10 +1,9 @@
 import { IQuery } from '@nestjs/cqrs';
-import { AuthProvider, SiteType } from '@prisma/client';
+import { LoginAuthDto } from 'src/auth/dtos/auth.dto';
 
 export class GetUserQuery implements IQuery {
   constructor(
-    public readonly userId: string,
-    public readonly siteName: SiteType,
-    public readonly authProvider: AuthProvider,
+    public readonly loginAuthDto?: LoginAuthDto,
+    public readonly userSeq?: string,
   ) {}
 }

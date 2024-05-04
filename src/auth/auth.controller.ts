@@ -8,17 +8,23 @@ import {
   Req,
   Res,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginAuthDto } from './dtos/auth.dto';
+import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
 import {
   Response as ExpressResponse,
   Request as ExpressRequest,
 } from 'express';
 import { SiteType } from '@prisma/client';
-import { AuthenticatedRequest } from 'src/shared/interfaces/OAuth.interface';
+import {
+  AuthenticatedRequest,
+  IOAuthGoogleUser,
+} from 'src/shared/interfaces/OAuth.interface';
 import { CommandBus } from '@nestjs/cqrs';
 import { LoginCommand } from './commands/login.command';
+import { AuthGuard } from '@nestjs/passport';
+import { LoginAuthDtoType } from './stategies/login-strategy.inteface';
 
 @Controller('auth')
 export class AuthController {
@@ -49,6 +55,29 @@ export class AuthController {
     res.cookie('access_token', '', { httpOnly: true, expires: new Date(0) });
     res.cookie('refresh_token', '', { httpOnly: true, expires: new Date(0) });
     res.send();
+  }
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(
+    @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
+    @Response() res: ExpressResponse,
+  ) {
+    console.log('GET oauth2/redirect/google - googleAuthRedirect 실행');
+
+    const { user } = req;
+    const dto: LoginAuthWithSocialDto = {
+      userId: user.email,
+      siteType: user.site,
+      loginProvider: 'GOOGLE',
+      type: 'social',
+    };
+
+    console.log(user.site, user.site in SiteType);
+    if (user.site in SiteType) {
+      const tokens = await this.authService.login(dto);
+      console.log(tokens);
+    } else return res.send('<div>잘못된 접근입니다.</div>');
   }
 
   @Get('login/google')

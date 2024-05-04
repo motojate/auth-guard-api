@@ -1,28 +1,35 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetUserQuery } from './get-user.query';
-import { UserSiteMapping } from '@prisma/client';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @QueryHandler(GetUserQuery)
 export class GetUserHandler implements IQueryHandler<GetUserQuery> {
   constructor(private readonly prisma: PrismaService) {}
 
-  execute(query: GetUserQuery): Promise<UserSiteMapping> {
-    return this.prisma.userSiteMapping.findUnique({
-      where: {
-        userSiteAuthProvider: {
-          userId: query.userId,
-          siteName: query.siteName,
-          authProvider: query.authProvider,
+  async execute(query: GetUserQuery) {
+    const whereCondition = this.buildWhereCondition(query);
+    console.log(whereCondition);
+    return this.prisma.user.findUnique({ where: whereCondition });
+  }
+
+  private buildWhereCondition(
+    query: GetUserQuery,
+  ): Prisma.UserWhereUniqueInput {
+    const conditions: {
+      [key in keyof GetUserQuery]: () => Prisma.UserWhereUniqueInput;
+    } = {
+      userSeq: () => ({ userSeq: query.userSeq }),
+      loginAuthDto: () => ({
+        userIdSiteType: {
+          userId: query.loginAuthDto.userId,
+          siteType: query.loginAuthDto.siteType,
         },
-      },
-      include: {
-        user: {
-          select: {
-            password: true,
-          },
-        },
-      },
-    });
+      }),
+    };
+
+    const key = Object.keys(query).find((k) => query[k] !== undefined);
+
+    return conditions[key]();
   }
 }

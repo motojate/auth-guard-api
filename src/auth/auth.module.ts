@@ -9,6 +9,9 @@ import { RedisCacheModule } from 'src/shared/redis/redis-cache.module';
 import { LoginHandler } from './commands/login.hanler';
 import { LoginEventHandler } from './events/login.event.handler';
 import { GetUserHandler } from 'src/user/queries/get-user.handler';
+import { PasswordLoginStrategy, SocialLoginStrategy } from './stategies';
+import { LoginStrategyFactory } from './stategies/login-strategy.factory';
+import { UserCreateHandler } from 'src/user/commands/user-create.handler';
 
 @Module({
   imports: [
@@ -26,6 +29,10 @@ import { GetUserHandler } from 'src/user/queries/get-user.handler';
     LoginHandler,
     LoginEventHandler,
     GetUserHandler,
+    UserCreateHandler,
+    PasswordLoginStrategy,
+    SocialLoginStrategy,
+    LoginStrategyFactory,
   ],
   controllers: [AuthController],
   exports: [AuthService, JwtModule, JwtGoogleStrategy],

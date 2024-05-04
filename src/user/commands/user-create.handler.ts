@@ -7,19 +7,25 @@ import { generateHashedPassword } from 'src/shared/utils/password-hash.util';
 export class UserCreateHandler implements ICommandHandler<UserCreateCommand> {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(command: UserCreateCommand): Promise<void> {
-    const hashedPassword = await generateHashedPassword(command.password);
-    await this.prisma.user.create({
+  async execute(command: UserCreateCommand): Promise<string> {
+    const { userId, password, siteType, loginProvider } = command.userCreateDto;
+
+    const hashedPassword = password
+      ? await generateHashedPassword(password)
+      : password;
+
+    const user = await this.prisma.user.create({
+      select: {
+        userSeq: true,
+      },
       data: {
+        userId,
         password: hashedPassword,
-        sites: {
-          create: {
-            userId: command.userId,
-            siteName: command.siteType,
-            authProvider: 'LOCAL',
-          },
-        },
+        siteType,
+        authProvider: loginProvider,
       },
     });
+
+    return user.userSeq;
   }
 }
