@@ -11,20 +11,19 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginAuthDto, LoginAuthWithSocialDto } from './dtos/auth.dto';
+import {
+  LoginAuthWithPasswordDto,
+  LoginAuthWithSocialDto,
+} from './dtos/auth.dto';
 import {
   Response as ExpressResponse,
   Request as ExpressRequest,
 } from 'express';
 import { SiteType } from '@prisma/client';
-import {
-  AuthenticatedRequest,
-  IOAuthGoogleUser,
-} from 'src/shared/interfaces/OAuth.interface';
+import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
 import { CommandBus } from '@nestjs/cqrs';
 import { LoginCommand } from './commands/login.command';
 import { AuthGuard } from '@nestjs/passport';
-import { LoginAuthDtoType } from './stategies/login-strategy.inteface';
 
 @Controller('auth')
 export class AuthController {
@@ -36,9 +35,10 @@ export class AuthController {
   @Post('login')
   @HttpCode(201)
   async login(
-    @Body() loginAuthDto: LoginAuthDto,
+    @Body() loginAuthDto: LoginAuthWithPasswordDto,
     @Response() res: ExpressResponse,
   ) {
+    console.log(loginAuthDto);
     const tokens = await this.commandBus.execute(
       new LoginCommand(loginAuthDto),
     );
@@ -63,8 +63,6 @@ export class AuthController {
     @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
     @Response() res: ExpressResponse,
   ) {
-    console.log('GET oauth2/redirect/google - googleAuthRedirect 실행');
-
     const { user } = req;
     const dto: LoginAuthWithSocialDto = {
       userId: user.email,
@@ -73,7 +71,6 @@ export class AuthController {
       type: 'social',
     };
 
-    console.log(user.site, user.site in SiteType);
     if (user.site in SiteType) {
       const tokens = await this.authService.login(dto);
       console.log(tokens);
@@ -85,37 +82,6 @@ export class AuthController {
     const state = encodeURIComponent(JSON.stringify({ site }));
     const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_CALLBACK_URL}&scope=email profile&state=${state}`;
     res.redirect(url);
-  }
-
-  // @Get('google/callback')
-  // @HttpCode(201)
-  // @UseGuards(AuthGuard('google'))
-  // googleAuthRedirect(
-  //   @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
-  //   @Response() res: ExpressResponse,
-  // ) {
-  //   const googleOAuthUser = req.user;
-  //   return this.authService.OAuthLogin(googleOAuthUser).pipe(
-  //     map((tokens) => {
-  //       res.cookie('access_token', tokens.access_token, { httpOnly: true });
-  //       res.cookie('refresh_token', tokens.refresh_token, {
-  //         httpOnly: true,
-  //       });
-  //       const response = BaseResponse.success(null);
-  //       res.json(response);
-  //       res.redirect('http://localhost:3000');
-  //     }),
-  //   );
-  // }
-
-  @Get('jwt/check')
-  getJwtCookieCheck(@Req() req: AuthenticatedRequest): string {
-    return req.user.userSeq;
-  }
-
-  @Post('jwt/check')
-  postJwtCookieCheck(@Req() req: AuthenticatedRequest): string {
-    return req.user.userSeq;
   }
 
   @Get('refresh')

@@ -27,6 +27,11 @@ export const SITE_DATA: ISiteData[] = [
     name: '영양 지킴이',
     redirectUrl: '',
   },
+  {
+    siteType: SiteType.STUDY_DIARY,
+    name: '공부 일기',
+    redirectUrl: '',
+  },
 ];
 
 export const SOCIAL_DATA: AuthProvider[] = [

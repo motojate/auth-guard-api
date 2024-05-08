@@ -1,12 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
-  LoginAuthDto,
-  LoginAuthWithPasswordDto,
-  LoginAuthWithSocialDto,
-} from './dtos/auth.dto';
-import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
-import {
   HeaderToken,
   ValidateUserInfo,
 } from 'src/shared/interfaces/common.interface';
@@ -22,7 +16,6 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly redisService: RedisCacheService,
-    private readonly queryBus: QueryBus,
     private readonly eventBus: EventBus,
     private readonly loginStrategyFactory: LoginStrategyFactory,
   ) {}
@@ -52,15 +45,6 @@ export class AuthService {
       accessToken,
       refreshToken,
     };
-  }
-
-  async socialLogin(googleOAuthUser: IOAuthGoogleUser) {
-    const dto: LoginAuthWithSocialDto = {
-      userId: googleOAuthUser.email,
-      siteType: googleOAuthUser.site,
-      loginProvider: 'GOOGLE',
-    };
-    return 1;
   }
 
   async verifyToken(token: string) {

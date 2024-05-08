@@ -29,6 +29,7 @@ enum SiteType {
   MEAL_GUARD
   PILL_GUARD
   MYEONJEOB_BOKKA
+  STUDY_DIARY
 }
 
 enum AuthProvider {

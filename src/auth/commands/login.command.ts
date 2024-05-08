@@ -7,6 +7,7 @@ export class LoginCommand implements ICommand {
   readonly password: string;
   readonly siteType: SiteType;
   readonly loginProvider: AuthProvider;
+  readonly type: 'password' | 'social';
 
   constructor(loginAuthDto: LoginAuthDto) {
     Object.assign(this, loginAuthDto);

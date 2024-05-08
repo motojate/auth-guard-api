@@ -3,13 +3,14 @@ import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 import { SITE_DATA, SOCIAL_DATA } from 'src/shared/constants/db.constant';
 
 export class LoginAuthDto {
-  readonly type?: 'password' | 'social';
+  @IsString()
+  readonly type: 'password' | 'social';
 
   @IsString()
   @IsNotEmpty()
   readonly userId: string;
 
-  @IsIn(SITE_DATA.map((item) => item.name))
+  @IsIn(SITE_DATA.map((item) => item.siteType))
   @IsNotEmpty()
   readonly siteType: SiteType;
 
@@ -19,7 +20,8 @@ export class LoginAuthDto {
 }
 
 export class LoginAuthWithPasswordDto extends LoginAuthDto {
-  readonly type? = 'password';
+  @IsString()
+  readonly type = 'password';
 
   @IsString()
   @IsNotEmpty()
@@ -27,5 +29,6 @@ export class LoginAuthWithPasswordDto extends LoginAuthDto {
 }
 
 export class LoginAuthWithSocialDto extends LoginAuthDto {
-  readonly type? = 'social';
+  @IsString()
+  readonly type = 'social';
 }

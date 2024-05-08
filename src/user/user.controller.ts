@@ -1,23 +1,26 @@
 import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
-import { UserService } from './user.service';
 import {
   CheckAvailabilityUserIdDto,
   SignUpMemberUserDto,
 } from './dtos/user.dto';
-import { AuthProvider, SiteType } from '@prisma/client';
 import { GetValidUserIdQuery } from './queries/get-valid-user-id.query';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { UserCreateCommand } from './commands/user-create.command';
+import { BaseResponse } from 'src/shared/responses/base.response';
 
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userService: UserService,
     private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
   ) {}
 
-  @Post('create')
+  @Post('join')
   async signUp(@Body() singUpMemberUser: SignUpMemberUserDto) {
-    return this.userService.create(singUpMemberUser);
+    const userSeq = await this.commandBus.execute<UserCreateCommand, string>(
+      new UserCreateCommand({ loginProvider: 'LOCAL', ...singUpMemberUser }),
+    );
+    return BaseResponse.success<string>(userSeq, 1000);
   }
 
   @Get('check/availability')
