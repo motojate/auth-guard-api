@@ -13,6 +13,11 @@ export interface IOAuthGoogleUser {
   picture: string;
   site: SiteType;
 }
+export interface IOAuthNaverUser {
+  name: string;
+  email: string;
+  site: SiteType;
+}
 export interface AuthenticatedRequest extends Request {
   user: ValidateUserInfo;
 }

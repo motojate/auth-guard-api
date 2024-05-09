@@ -20,7 +20,10 @@ import {
   Request as ExpressRequest,
 } from 'express';
 import { SiteType } from '@prisma/client';
-import { IOAuthGoogleUser } from 'src/shared/interfaces/OAuth.interface';
+import {
+  IOAuthGoogleUser,
+  IOAuthNaverUser,
+} from 'src/shared/interfaces/OAuth.interface';
 import { CommandBus } from '@nestjs/cqrs';
 import { LoginCommand } from './commands/login.command';
 import { AuthGuard } from '@nestjs/passport';
@@ -57,6 +60,41 @@ export class AuthController {
     res.send();
   }
 
+  @Get('login/naver')
+  // @UseGuards(AuthGuard('naver'))
+  async loginNaver(@Query('site') site: SiteType, @Res() res: ExpressResponse) {
+    const state = encodeURIComponent(site);
+    const url = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${process.env.NAVER_CLIENT_ID}&state=${state}&redirect_uri=${process.env.NAVER_CALLBACK_URL}`;
+    res.redirect(url);
+  }
+
+  @Get('naver/callback')
+  @UseGuards(AuthGuard('naver'))
+  async naverAuthRedirect(
+    @Req() req: ExpressRequest & { user: IOAuthNaverUser },
+    @Response() res: ExpressResponse,
+  ) {
+    const { user } = req;
+    const dto: LoginAuthWithSocialDto = {
+      userId: user.email,
+      siteType: user.site,
+      loginProvider: 'NAVER',
+      type: 'social',
+    };
+
+    if (user.site in SiteType) {
+      const tokens = await this.authService.login(dto);
+      console.log(tokens);
+    } else return res.send('<div>잘못된 접근입니다.</div>');
+  }
+
+  @Get('login/google')
+  loginGoogle(@Query('site') site: SiteType, @Res() res: ExpressResponse) {
+    const state = encodeURIComponent(JSON.stringify({ site }));
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_CALLBACK_URL}&scope=email profile&state=${state}`;
+    res.redirect(url);
+  }
+
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(
@@ -75,13 +113,6 @@ export class AuthController {
       const tokens = await this.authService.login(dto);
       console.log(tokens);
     } else return res.send('<div>잘못된 접근입니다.</div>');
-  }
-
-  @Get('login/google')
-  loginGoogle(@Query('site') site: SiteType, @Res() res: ExpressResponse) {
-    const state = encodeURIComponent(JSON.stringify({ site }));
-    const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_CALLBACK_URL}&scope=email profile&state=${state}`;
-    res.redirect(url);
   }
 
   @Get('refresh')

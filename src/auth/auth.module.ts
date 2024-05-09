@@ -12,6 +12,7 @@ import { GetUserHandler } from 'src/user/queries/get-user.handler';
 import { PasswordLoginStrategy, SocialLoginStrategy } from './stategies';
 import { LoginStrategyFactory } from './stategies/login-strategy.factory';
 import { UserCreateHandler } from 'src/user/commands/user-create.handler';
+import { JwtNaverStrategy } from './jwt-social-naver.strategy';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UserCreateHandler } from 'src/user/commands/user-create.handler';
   providers: [
     AuthService,
     JwtGoogleStrategy,
+    JwtNaverStrategy,
     LoginHandler,
     LoginEventHandler,
     GetUserHandler,
@@ -35,6 +37,6 @@ import { UserCreateHandler } from 'src/user/commands/user-create.handler';
     LoginStrategyFactory,
   ],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule, JwtGoogleStrategy],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

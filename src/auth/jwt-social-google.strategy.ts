@@ -22,7 +22,6 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
     try {
       const { name, emails, photos } = profile;
       const { site } = JSON.parse(req.query.state);
-      console.log(site);
       const user = {
         email: emails[0].value,
         name: name.displayName,
