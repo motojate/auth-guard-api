@@ -9,9 +9,17 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RedisCacheModule } from './shared/redis/redis-cache.module';
 import { CustomCqrsModule } from './shared/cqrs/custom-cqrs.module';
 import { KafkaModule } from './kafka/kafka.module';
+import { SiteModule } from './site/site.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
+      serveRoot: '/api/invalid-access',
+      renderPath: '/',
+    }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
@@ -28,6 +36,7 @@ import { KafkaModule } from './kafka/kafka.module';
     //KafkaModule,
     RedisCacheModule,
     CustomCqrsModule,
+    SiteModule,
   ],
   controllers: [AppController],
   providers: [AppService],

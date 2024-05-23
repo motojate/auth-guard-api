@@ -1,3 +1,8 @@
+import { Request, Response } from 'express';
+
+export type ExpressRequest = Request;
+export type ExpressResponse = Response;
+
 export interface HeaderToken {
   accessToken: string;
   refreshToken: string;

@@ -1,14 +1,15 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, Profile } from 'passport-naver-v2';
+import { Strategy, Profile } from 'passport-kakao';
 import { VerifyCallback } from 'passport-oauth2';
 import { ExpressRequest } from 'src/shared/interfaces/common.interface';
 
-export class JwtNaverStrategy extends PassportStrategy(Strategy, 'naver') {
+export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   constructor() {
     super({
-      clientID: process.env.NAVER_CLIENT_ID,
-      clientSecret: process.env.NAVER_CLIENT_SECRET,
-      callbackURL: process.env.NAVER_CALLBACK_URL,
+      clientID: process.env.KAKAO_CLIENT_ID,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET,
+      callbackURL: process.env.KAKAO_CALLBACK_URL,
+      scope: ['account_email'],
       passReqToCallback: true,
     });
   }
@@ -21,11 +22,13 @@ export class JwtNaverStrategy extends PassportStrategy(Strategy, 'naver') {
     done: VerifyCallback,
   ) {
     try {
+      const jsonToUser = profile._json;
       const user = {
-        email: profile.email,
+        email: jsonToUser.kakao_account.email ?? jsonToUser.id,
         name: profile.name,
         site: req.query.state,
       };
+
       return done(null, user);
     } catch (e) {
       return done(e);

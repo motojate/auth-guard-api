@@ -13,12 +13,14 @@ import { PasswordLoginStrategy, SocialLoginStrategy } from './stategies';
 import { LoginStrategyFactory } from './stategies/login-strategy.factory';
 import { UserCreateHandler } from 'src/user/commands/user-create.handler';
 import { JwtNaverStrategy } from './jwt-social-naver.strategy';
+import { JwtKakaoStrategy } from './jwt-social-kakao.strategy';
+import { GetSiteRedirectUrlHandler } from 'src/site/queries/get-site-redirect-url.handler';
 
 @Module({
   imports: [
     JwtModule.register({
       privateKey: process.env.JWT_PRIVATE_SECRET,
-      signOptions: { algorithm: 'RS256', expiresIn: '1000m' },
+      signOptions: { algorithm: 'RS256', expiresIn: '15m' },
     }),
     UserModule,
     EmailVerificationModule,
@@ -28,6 +30,7 @@ import { JwtNaverStrategy } from './jwt-social-naver.strategy';
     AuthService,
     JwtGoogleStrategy,
     JwtNaverStrategy,
+    JwtKakaoStrategy,
     LoginHandler,
     LoginEventHandler,
     GetUserHandler,
@@ -35,6 +38,7 @@ import { JwtNaverStrategy } from './jwt-social-naver.strategy';
     PasswordLoginStrategy,
     SocialLoginStrategy,
     LoginStrategyFactory,
+    GetSiteRedirectUrlHandler,
   ],
   controllers: [AuthController],
   exports: [AuthService, JwtModule],

@@ -50,7 +50,7 @@ model User {
   siteType     SiteType     @map("site_type")
   site         Site         @relation(fields: [siteType], references: [siteType])
 
-  @@unique([userId, siteType], name: "userIdSiteType")
+  @@unique([userId, siteType, authProvider], name: "userIdSiteTypeAuthProvider")
   @@map("AT_MB_USER")
 }
 

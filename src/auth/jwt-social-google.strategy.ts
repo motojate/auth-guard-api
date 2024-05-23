@@ -1,5 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, VerifyCallback } from 'passport-google-oauth20';
+import { Strategy, VerifyCallback, Profile } from 'passport-google-oauth20';
+import { ExpressRequest } from 'src/shared/interfaces/common.interface';
 
 export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor() {
@@ -13,18 +14,19 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(
-    req: any,
-    accessToken: string,
-    refreshToken: string,
-    profile: any,
+    req: ExpressRequest,
+    _accessToken: string,
+    _refreshToken: string,
+    profile: Profile,
     done: VerifyCallback,
   ) {
     try {
       const { name, emails, photos } = profile;
-      const { site } = JSON.parse(req.query.state);
+      const site = req.query.state;
+
       const user = {
         email: emails[0].value,
-        name: name.displayName,
+        name: name,
         picture: photos[0].value,
         site,
       };

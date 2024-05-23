@@ -9,7 +9,6 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
 
   async execute(query: GetUserQuery) {
     const whereCondition = this.buildWhereCondition(query);
-    console.log(whereCondition);
     return this.prisma.user.findUnique({ where: whereCondition });
   }
 
@@ -21,9 +20,10 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
     } = {
       userSeq: () => ({ userSeq: query.userSeq }),
       loginAuthDto: () => ({
-        userIdSiteType: {
+        userIdSiteTypeAuthProvider: {
           userId: query.loginAuthDto.userId,
           siteType: query.loginAuthDto.siteType,
+          authProvider: query.loginAuthDto.loginProvider,
         },
       }),
     };

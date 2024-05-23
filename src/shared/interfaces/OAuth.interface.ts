@@ -7,17 +7,20 @@ export interface PayloadInterface {
   iat: number;
   exp: number;
 }
-export interface IOAuthGoogleUser {
+interface IOAuthBaseUser {
   name: string;
   email: string;
+  site: SiteType;
+}
+export interface IOAuthGoogleUser extends IOAuthBaseUser {
   picture: string;
-  site: SiteType;
 }
-export interface IOAuthNaverUser {
-  name: string;
-  email: string;
-  site: SiteType;
-}
+export type IOAuthNaverUser = IOAuthBaseUser;
+export type IOAuthKakaoUser = IOAuthBaseUser;
+export type IOAuthSocialUser =
+  | IOAuthGoogleUser
+  | IOAuthNaverUser
+  | IOAuthKakaoUser;
 export interface AuthenticatedRequest extends Request {
   user: ValidateUserInfo;
 }
