@@ -30,6 +30,7 @@ enum SiteType {
   PILL_GUARD
   MYEONJEOB_BOKKA
   STUDY_DIARY
+  CERTIFICATE_QUESTION
 }
 
 enum AuthProvider {
