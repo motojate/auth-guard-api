@@ -21,5 +21,5 @@
       "@nestjs-microservices/shared/dto": ["libs/shared/src/lib/dto/index.ts"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "test/**/*"]
 }
