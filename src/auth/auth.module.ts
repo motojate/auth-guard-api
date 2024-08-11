@@ -20,11 +20,11 @@ import { GetSiteRedirectUrlHandler } from 'src/site/queries/get-site-redirect-ur
   imports: [
     JwtModule.register({
       privateKey: process.env.JWT_PRIVATE_SECRET,
-      signOptions: { algorithm: 'RS256', expiresIn: '15m' },
+      signOptions: { algorithm: 'RS256', expiresIn: '15m' }
     }),
     UserModule,
     EmailVerificationModule,
-    RedisCacheModule,
+    RedisCacheModule
   ],
   providers: [
     AuthService,
@@ -38,9 +38,9 @@ import { GetSiteRedirectUrlHandler } from 'src/site/queries/get-site-redirect-ur
     PasswordLoginStrategy,
     SocialLoginStrategy,
     LoginStrategyFactory,
-    GetSiteRedirectUrlHandler,
+    GetSiteRedirectUrlHandler
   ],
   controllers: [AuthController],
-  exports: [AuthService, JwtModule],
+  exports: [AuthService, JwtModule]
 })
 export class AuthModule {}

@@ -17,11 +17,11 @@ export class UserService {
           data: {
             userId: dto.userId,
             password: hashedPassword,
-            siteType: dto.siteType,
-          },
-        }),
+            siteType: dto.siteType
+          }
+        })
       ),
-      catchError((e) => throwError(() => new PrismaException(e))),
+      catchError((e) => throwError(() => new PrismaException(e)))
     );
   }
 
@@ -32,12 +32,12 @@ export class UserService {
           userId: dto.userId,
           password: null,
           siteType: dto.siteType,
-          authProvider: dto.loginProvider,
-        },
-      }),
+          authProvider: dto.loginProvider
+        }
+      })
     ).pipe(
       map((user) => user.userSeq),
-      catchError((e) => throwError(() => new PrismaException(e))),
+      catchError((e) => throwError(() => new PrismaException(e)))
     );
   }
 
@@ -45,9 +45,9 @@ export class UserService {
     return from(
       this.prisma.user.findUnique({
         where: {
-          userSeq,
-        },
-      }),
+          userSeq
+        }
+      })
     ).pipe(
       map((user) => {
         if (!user) throw new InvalidUserException();
@@ -55,7 +55,7 @@ export class UserService {
       }),
       catchError((e) => {
         return throwError(() => new PrismaException(e));
-      }),
+      })
     );
   }
 }

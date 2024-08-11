@@ -13,9 +13,7 @@ export class PasswordLoginStrategy implements ILoginStrategy {
 
   async authenticate(loginAuthDto: LoginAuthWithPasswordDto): Promise<string> {
     const { password, ...dto } = loginAuthDto;
-    const user = await this.queryBus.execute<GetUserQuery, User>(
-      new GetUserQuery(dto),
-    );
+    const user = await this.queryBus.execute<GetUserQuery, User>(new GetUserQuery(dto));
     if (!user) throw new InvalidUserException();
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) throw new InvalidUserException();

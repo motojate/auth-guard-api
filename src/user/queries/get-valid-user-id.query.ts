@@ -5,6 +5,6 @@ export class GetValidUserIdQuery implements IQuery {
   constructor(
     public readonly userId: string,
     public readonly siteName: SiteType,
-    public readonly authProvider: AuthProvider,
+    public readonly authProvider: AuthProvider
   ) {}
 }

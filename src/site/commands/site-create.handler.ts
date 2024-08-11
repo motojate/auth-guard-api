@@ -14,8 +14,8 @@ export class UserCreateHandler implements ICommandHandler<SiteCreateCommand> {
       data: {
         siteType,
         name,
-        redirectUrl,
-      },
+        redirectUrl
+      }
     });
 
     return site.siteType;

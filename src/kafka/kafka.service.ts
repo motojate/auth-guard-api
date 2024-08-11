@@ -1,16 +1,9 @@
-import {
-  Inject,
-  Injectable,
-  OnModuleDestroy,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
 export class KafkaService implements OnModuleInit, OnModuleDestroy {
-  constructor(
-    @Inject('auth-kafka') private readonly clientKafka: ClientKafka,
-  ) {}
+  constructor(@Inject('auth-kafka') private readonly clientKafka: ClientKafka) {}
 
   async onModuleInit() {
     await this.clientKafka.connect();

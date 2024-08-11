@@ -1,50 +1,30 @@
-import {
-  Controller,
-  HttpCode,
-  Response,
-  Body,
-  Post,
-  Get,
-  Req,
-  Res,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, HttpCode, Response, Body, Post, Get, Req, Res, Query, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthWithPasswordDto } from './dtos/auth.dto';
 
 import { SiteType } from '@prisma/client';
-import {
-  IOAuthGoogleUser,
-  IOAuthNaverUser,
-} from 'src/shared/interfaces/OAuth.interface';
+import { IOAuthGoogleUser, IOAuthNaverUser } from 'src/shared/interfaces/OAuth.interface';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { LoginCommand } from './commands/login.command';
 import { AuthGuard } from '@nestjs/passport';
-import {
-  ExpressRequest,
-  ExpressResponse,
-} from 'src/shared/interfaces/common.interface';
+import { ExpressRequest, ExpressResponse } from 'src/shared/interfaces/common.interface';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
+    private readonly queryBus: QueryBus
   ) {}
 
   @Post('login')
   @HttpCode(201)
-  async login(
-    @Body() loginAuthDto: LoginAuthWithPasswordDto,
-    @Response() res: ExpressResponse,
-  ) {
+  async login(@Body() loginAuthDto: LoginAuthWithPasswordDto, @Response() res: ExpressResponse) {
     const command = new LoginCommand(loginAuthDto);
     const tokens = await this.commandBus.execute(command);
     res.cookie('access_token', tokens.accessToken, { httpOnly: true });
     res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
+      httpOnly: true
     });
     res.send();
   }
@@ -66,17 +46,13 @@ export class AuthController {
 
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuthRedirect(
-    @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
-    @Response() res: ExpressResponse,
-  ) {
+  async kakaoAuthRedirect(@Req() req: ExpressRequest & { user: IOAuthGoogleUser }, @Response() res: ExpressResponse) {
     const { user } = req;
     try {
-      const { accessToken, refreshToken, url } =
-        await this.authService.loginWithSocial(user, 'KAKAO');
+      const { accessToken, refreshToken, url } = await this.authService.loginWithSocial(user, 'KAKAO');
       res.cookie('access_token', accessToken, { httpOnly: true });
       res.cookie('refresh_token', refreshToken, {
-        httpOnly: true,
+        httpOnly: true
       });
       res.redirect(url);
     } catch (e) {
@@ -94,17 +70,13 @@ export class AuthController {
 
   @Get('naver/callback')
   @UseGuards(AuthGuard('naver'))
-  async naverAuthRedirect(
-    @Req() req: ExpressRequest & { user: IOAuthNaverUser },
-    @Response() res: ExpressResponse,
-  ) {
+  async naverAuthRedirect(@Req() req: ExpressRequest & { user: IOAuthNaverUser }, @Response() res: ExpressResponse) {
     const { user } = req;
     try {
-      const { accessToken, refreshToken, url } =
-        await this.authService.loginWithSocial(user, 'NAVER');
+      const { accessToken, refreshToken, url } = await this.authService.loginWithSocial(user, 'NAVER');
       res.cookie('access_token', accessToken, { httpOnly: true });
       res.cookie('refresh_token', refreshToken, {
-        httpOnly: true,
+        httpOnly: true
       });
       res.redirect(url);
     } catch (e) {
@@ -120,17 +92,13 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(
-    @Req() req: ExpressRequest & { user: IOAuthGoogleUser },
-    @Response() res: ExpressResponse,
-  ) {
+  async googleAuthRedirect(@Req() req: ExpressRequest & { user: IOAuthGoogleUser }, @Response() res: ExpressResponse) {
     const { user } = req;
     try {
-      const { accessToken, refreshToken, url } =
-        await this.authService.loginWithSocial(user, 'GOOGLE');
+      const { accessToken, refreshToken, url } = await this.authService.loginWithSocial(user, 'GOOGLE');
       res.cookie('access_token', accessToken, { httpOnly: true });
       res.cookie('refresh_token', refreshToken, {
-        httpOnly: true,
+        httpOnly: true
       });
       res.redirect(url);
     } catch (e) {
@@ -143,10 +111,10 @@ export class AuthController {
     const { refresh_token: refreshToken } = req.cookies;
     const tokens = await this.authService.refreshToken(refreshToken);
     res.cookie('access_token', tokens.accessToken, {
-      httpOnly: true,
+      httpOnly: true
     });
     res.cookie('refresh_token', tokens.refreshToken, {
-      httpOnly: true,
+      httpOnly: true
     });
     res.send();
   }

@@ -22,11 +22,7 @@ export class ExpiredTokenException extends BaseException {
 
 export class ExpiredRefreshTokenException extends BaseException {
   constructor() {
-    super(
-      ERROR_CODES.EXPIRED_REFRESH_TOKEN,
-      'EXPIRED_REFRESH_TOKEN',
-      HttpStatus.UNAUTHORIZED,
-    );
+    super(ERROR_CODES.EXPIRED_REFRESH_TOKEN, 'EXPIRED_REFRESH_TOKEN', HttpStatus.UNAUTHORIZED);
   }
 }
 

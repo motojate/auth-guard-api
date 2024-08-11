@@ -12,16 +12,16 @@ import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
         options: {
           client: {
             clientId: 'my-guard-auth',
-            brokers: ['127.0.0.1:9092'],
+            brokers: ['127.0.0.1:9092']
           },
           consumer: {
-            groupId: 'my-guard-auth-group',
-          },
-        },
-      },
-    ]),
+            groupId: 'my-guard-auth-group'
+          }
+        }
+      }
+    ])
   ],
   providers: [KafkaService, ClientKafka],
-  exports: [KafkaService],
+  exports: [KafkaService]
 })
 export class KafkaModule {}

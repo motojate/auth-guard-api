@@ -12,9 +12,7 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
     return this.prisma.user.findUnique({ where: whereCondition });
   }
 
-  private buildWhereCondition(
-    query: GetUserQuery,
-  ): Prisma.UserWhereUniqueInput {
+  private buildWhereCondition(query: GetUserQuery): Prisma.UserWhereUniqueInput {
     const conditions: {
       [key in keyof GetUserQuery]: () => Prisma.UserWhereUniqueInput;
     } = {
@@ -23,9 +21,9 @@ export class GetUserHandler implements IQueryHandler<GetUserQuery> {
         userIdSiteTypeAuthProvider: {
           userId: query.loginAuthDto.userId,
           siteType: query.loginAuthDto.siteType,
-          authProvider: query.loginAuthDto.loginProvider,
-        },
-      }),
+          authProvider: query.loginAuthDto.loginProvider
+        }
+      })
     };
 
     const key = Object.keys(query).find((k) => query[k] !== undefined);

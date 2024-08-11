@@ -8,15 +8,10 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SocialLoginStrategy implements ILoginStrategy {
-  constructor(
-    private readonly queryBus: QueryBus,
-    private readonly commandBus: CommandBus,
-  ) {}
+  constructor(private readonly queryBus: QueryBus, private readonly commandBus: CommandBus) {}
 
   async authenticate(loginAuthDto: LoginAuthWithSocialDto): Promise<string> {
-    const user = await this.queryBus.execute<GetUserQuery, User>(
-      new GetUserQuery(loginAuthDto),
-    );
+    const user = await this.queryBus.execute<GetUserQuery, User>(new GetUserQuery(loginAuthDto));
 
     if (user) return user.userSeq;
     else return this.createUser(loginAuthDto);
@@ -24,7 +19,7 @@ export class SocialLoginStrategy implements ILoginStrategy {
 
   private async createUser(dto: LoginAuthWithSocialDto): Promise<string> {
     const userSeq = await this.commandBus.execute<UserCreateCommand, string>(
-      new UserCreateCommand({ password: null, ...dto }),
+      new UserCreateCommand({ password: null, ...dto })
     );
     return userSeq;
   }

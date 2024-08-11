@@ -17,10 +17,7 @@ export interface IOAuthGoogleUser extends IOAuthBaseUser {
 }
 export type IOAuthNaverUser = IOAuthBaseUser;
 export type IOAuthKakaoUser = IOAuthBaseUser;
-export type IOAuthSocialUser =
-  | IOAuthGoogleUser
-  | IOAuthNaverUser
-  | IOAuthKakaoUser;
+export type IOAuthSocialUser = IOAuthGoogleUser | IOAuthNaverUser | IOAuthKakaoUser;
 export interface AuthenticatedRequest extends Request {
   user: ValidateUserInfo;
 }

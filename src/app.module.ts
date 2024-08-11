@@ -12,23 +12,24 @@ import { KafkaModule } from './kafka/kafka.module';
 import { SiteModule } from './site/site.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { TestService } from './test/test.service';
 
 @Module({
   imports: [
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'client'),
       serveRoot: '/api/invalid-access',
-      renderPath: '/',
+      renderPath: '/'
     }),
     RedisModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         config: {
           host: configService.get('REDIS_HOST'),
-          port: configService.get('REDIS_PORT'),
-        },
+          port: configService.get('REDIS_PORT')
+        }
       }),
-      inject: [ConfigService],
+      inject: [ConfigService]
     }),
     UserModule,
     PrismaModule,
@@ -36,9 +37,9 @@ import { join } from 'path';
     //KafkaModule,
     RedisCacheModule,
     CustomCqrsModule,
-    SiteModule,
+    SiteModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, TestService]
 })
 export class AppModule {}

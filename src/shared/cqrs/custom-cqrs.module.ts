@@ -4,6 +4,6 @@ import { CqrsModule as NestCqrsModule } from '@nestjs/cqrs';
 @Global()
 @Module({
   imports: [NestCqrsModule],
-  exports: [NestCqrsModule],
+  exports: [NestCqrsModule]
 })
 export class CustomCqrsModule {}

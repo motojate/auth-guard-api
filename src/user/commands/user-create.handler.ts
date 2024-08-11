@@ -10,20 +10,18 @@ export class UserCreateHandler implements ICommandHandler<UserCreateCommand> {
   async execute(command: UserCreateCommand): Promise<string> {
     const { userId, password, siteType, loginProvider } = command.userCreateDto;
 
-    const hashedPassword = password
-      ? await generateHashedPassword(password)
-      : password;
+    const hashedPassword = password ? await generateHashedPassword(password) : password;
 
     const user = await this.prisma.user.create({
       select: {
-        userSeq: true,
+        userSeq: true
       },
       data: {
         userId,
         password: hashedPassword,
         siteType,
-        authProvider: loginProvider,
-      },
+        authProvider: loginProvider
+      }
     });
 
     return user.userSeq;

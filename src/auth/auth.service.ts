@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import {
-  HeaderToken,
-  ValidateUserInfo,
-} from 'src/shared/interfaces/common.interface';
+import { HeaderToken, ValidateUserInfo } from 'src/shared/interfaces/common.interface';
 import { RedisCacheService } from 'src/shared/redis/redis-cache.service';
 import { ExpiredRefreshTokenException } from 'src/shared/exceptions/token.exception';
 import { CommandBus, EventBus, QueryBus } from '@nestjs/cqrs';
@@ -24,7 +21,7 @@ export class AuthService {
     private readonly queryBus: QueryBus,
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
-    private readonly loginStrategyFactory: LoginStrategyFactory,
+    private readonly loginStrategyFactory: LoginStrategyFactory
   ) {}
 
   private createToken(userSeq: string, option?: { expiresIn: string }) {
@@ -45,13 +42,13 @@ export class AuthService {
     const userSeq = await strategy.authenticate(dto);
     const [accessToken, refreshToken] = await Promise.all([
       this.createToken(userSeq),
-      this.createRefreshToken(userSeq),
+      this.createRefreshToken(userSeq)
     ]);
     const event = new LoginEvent(userSeq);
     await this.eventBus.publish(event);
     return {
       accessToken,
-      refreshToken,
+      refreshToken
     };
   }
 
@@ -60,19 +57,14 @@ export class AuthService {
       userId: user.email,
       siteType: user.site,
       loginProvider,
-      type: 'social',
+      type: 'social'
     };
-    if (!Object.keys(SiteType).includes(user.site))
-      throw new Error('Invalid Site Type'); // TODO
+    if (!Object.keys(SiteType).includes(user.site)) throw new Error('Invalid Site Type'); // TODO
 
     const command = new LoginCommand(dto);
-    const tokens = await this.commandBus.execute<LoginCommand, HeaderToken>(
-      command,
-    );
+    const tokens = await this.commandBus.execute<LoginCommand, HeaderToken>(command);
     const urlQuery = new GetSiteRedirectUrlQuery(user.site);
-    const url = await this.queryBus.execute<GetSiteRedirectUrlQuery, string>(
-      urlQuery,
-    );
+    const url = await this.queryBus.execute<GetSiteRedirectUrlQuery, string>(urlQuery);
     const { accessToken, refreshToken } = tokens;
     return { accessToken, refreshToken, url };
   }
@@ -83,18 +75,16 @@ export class AuthService {
 
   async refreshToken(token: string): Promise<HeaderToken> {
     const payload = await this.verifyToken(token);
-    const redisToken = await this.redisService.get<string>(
-      `refresh-token:${payload.userSeq}`,
-    );
+    const redisToken = await this.redisService.get<string>(`refresh-token:${payload.userSeq}`);
 
     if (redisToken !== token) throw new ExpiredRefreshTokenException();
     const [accessToken, refreshToken] = await Promise.all([
       this.createToken(payload.userSeq),
-      this.createRefreshToken(payload.userSeq),
+      this.createRefreshToken(payload.userSeq)
     ]);
     return {
       accessToken,
-      refreshToken,
+      refreshToken
     };
   }
 }

@@ -8,8 +8,8 @@ export class LoginEventHandler implements IEventHandler<LoginEvent> {
   async handle(event: LoginEvent): Promise<void> {
     await this.prisma.loginHistory.create({
       data: {
-        userSeq: event.userSeq,
-      },
+        userSeq: event.userSeq
+      }
     });
   }
 }

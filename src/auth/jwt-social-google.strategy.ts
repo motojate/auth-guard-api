@@ -9,7 +9,7 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
       scope: ['email', 'profile'],
-      passReqToCallback: true,
+      passReqToCallback: true
     });
   }
 
@@ -18,7 +18,7 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
     _accessToken: string,
     _refreshToken: string,
     profile: Profile,
-    done: VerifyCallback,
+    done: VerifyCallback
   ) {
     try {
       const { name, emails, photos } = profile;
@@ -28,7 +28,7 @@ export class JwtGoogleStrategy extends PassportStrategy(Strategy, 'google') {
         email: emails[0].value,
         name: name,
         picture: photos[0].value,
-        site,
+        site
       };
 
       done(null, user);

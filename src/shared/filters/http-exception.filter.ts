@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  Logger,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger } from '@nestjs/common';
 import { Response } from 'express';
 import { ERROR_CODES } from 'src/shared/utils/response.util';
 import { BaseExceptionErrorStateInferface } from 'src/shared/interfaces/common.interface';
@@ -22,17 +16,15 @@ export class GlobalHttpExceptionFilter implements ExceptionFilter {
     const exceptionResponse = exception.getResponse();
     const { code, message } = this.getExceptionMessage(exceptionResponse);
 
-    this.logger.error(
-      `${method} ${url} ${status} - ERROR CODE: ${code} ${message}`,
-    );
+    this.logger.error(`${method} ${url} ${status} - ERROR CODE: ${code} ${message}`);
 
     response.status(status).json({
       code: code,
       result: {
         error: {
-          message: code === 2001 ? 'NETWORK_ERROR' : message,
-        },
-      },
+          message: code === 2001 ? 'NETWORK_ERROR' : message
+        }
+      }
     });
   }
 
@@ -40,26 +32,20 @@ export class GlobalHttpExceptionFilter implements ExceptionFilter {
     exceptionResponse:
       | string
       | BaseExceptionErrorStateInferface
-      | { statusCode?: number; message?: string; error?: string },
+      | { statusCode?: number; message?: string; error?: string }
   ): { code: number; message: string } {
-    if (typeof exceptionResponse === 'string')
-      return { code: ERROR_CODES.BAD_REQUEST, message: exceptionResponse };
+    if (typeof exceptionResponse === 'string') return { code: ERROR_CODES.BAD_REQUEST, message: exceptionResponse };
     if ('code' in exceptionResponse && 'result' in exceptionResponse)
       return {
         code: exceptionResponse.code,
-        message: exceptionResponse.result.error.message,
+        message: exceptionResponse.result.error.message
       };
-    if (
-      'statusCode' in exceptionResponse &&
-      exceptionResponse.statusCode === 400
-    )
+    if ('statusCode' in exceptionResponse && exceptionResponse.statusCode === 400)
       return {
         code: ERROR_CODES.BAD_REQUEST,
-        message:
-          exceptionResponse.message || exceptionResponse.error || 'BAD_REQUEST',
+        message: exceptionResponse.message || exceptionResponse.error || 'BAD_REQUEST'
       };
-    const message =
-      exceptionResponse.message || exceptionResponse.error || 'UNKNOWN_ERROR';
+    const message = exceptionResponse.message || exceptionResponse.error || 'UNKNOWN_ERROR';
     return { code: ERROR_CODES.UNKNOWN_ERROR, message: message };
   }
 }

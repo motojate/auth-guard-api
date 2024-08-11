@@ -8,7 +8,7 @@ import { ILoginStrategy } from './login-strategy.inteface';
 export class LoginStrategyFactory {
   constructor(
     private readonly passwordLoginStrategy: PasswordLoginStrategy,
-    private readonly socialLoginStrategy: SocialLoginStrategy,
+    private readonly socialLoginStrategy: SocialLoginStrategy
   ) {}
 
   getStrategy(dto: LoginAuthDto): ILoginStrategy {

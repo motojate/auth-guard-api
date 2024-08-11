@@ -3,6 +3,6 @@ import { RedisCacheService } from './redis-cache.service';
 
 @Module({
   providers: [RedisCacheService],
-  exports: [RedisCacheService],
+  exports: [RedisCacheService]
 })
 export class RedisCacheModule {}

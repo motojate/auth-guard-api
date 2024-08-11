@@ -9,7 +9,7 @@ export class JwtNaverStrategy extends PassportStrategy(Strategy, 'naver') {
       clientID: process.env.NAVER_CLIENT_ID,
       clientSecret: process.env.NAVER_CLIENT_SECRET,
       callbackURL: process.env.NAVER_CALLBACK_URL,
-      passReqToCallback: true,
+      passReqToCallback: true
     });
   }
 
@@ -18,13 +18,13 @@ export class JwtNaverStrategy extends PassportStrategy(Strategy, 'naver') {
     _accessToken: string,
     _refreshToken: string,
     profile: Profile,
-    done: VerifyCallback,
+    done: VerifyCallback
   ) {
     try {
       const user = {
         email: profile.email,
         name: profile.name,
-        site: req.query.state,
+        site: req.query.state
       };
       return done(null, user);
     } catch (e) {

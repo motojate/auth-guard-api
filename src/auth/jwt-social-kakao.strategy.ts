@@ -10,7 +10,7 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
       clientSecret: process.env.KAKAO_CLIENT_SECRET,
       callbackURL: process.env.KAKAO_CALLBACK_URL,
       scope: ['account_email'],
-      passReqToCallback: true,
+      passReqToCallback: true
     });
   }
 
@@ -19,14 +19,14 @@ export class JwtKakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     _accessToken: string,
     _refreshToken: string,
     profile: Profile,
-    done: VerifyCallback,
+    done: VerifyCallback
   ) {
     try {
       const jsonToUser = profile._json;
       const user = {
         email: jsonToUser.kakao_account.email ?? jsonToUser.id,
         name: profile.name,
-        site: req.query.state,
+        site: req.query.state
       };
 
       return done(null, user);

@@ -9,6 +9,6 @@ import { UserCreateHandler } from './commands/user-create.handler';
   imports: [RedisCacheModule],
   providers: [UserService, GetValidUserIDHandler, UserCreateHandler],
   controllers: [UserController],
-  exports: [UserService],
+  exports: [UserService]
 })
 export class UserModule {}

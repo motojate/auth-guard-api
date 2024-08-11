@@ -16,10 +16,6 @@ export class InUsedUserException extends BaseException {
 
 export class AuthMismatchException extends BaseException {
   constructor() {
-    super(
-      ERROR_CODES.INVALID_CREDENTIALS,
-      'INVALID_CREDENTIALS',
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    );
+    super(ERROR_CODES.INVALID_CREDENTIALS, 'INVALID_CREDENTIALS', HttpStatus.UNPROCESSABLE_ENTITY);
   }
 }
