@@ -6,7 +6,6 @@ import {
 import { GetValidUserIdQuery } from './queries/get-valid-user-id.query';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UserCreateCommand } from './commands/user-create.command';
-import { BaseResponse } from 'src/shared/responses/base.response';
 
 @Controller('user')
 export class UserController {
@@ -20,7 +19,7 @@ export class UserController {
     const userSeq = await this.commandBus.execute<UserCreateCommand, string>(
       new UserCreateCommand({ loginProvider: 'LOCAL', ...singUpMemberUser }),
     );
-    return BaseResponse.success<string>(userSeq, 1000);
+    return userSeq;
   }
 
   @Get('check/availability')

@@ -1,19 +1,26 @@
 import { RESPONSE_CODES } from '../utils/response.util';
 
 export class BaseResponse<T> {
-  constructor(public result: T | T[], public code: number) {}
+  constructor(private readonly code: number, private readonly data?: T) {}
 
-  static success<T>(
-    data: T | T[],
+  static createSuccessResponse<T>(
+    data: T,
     code = RESPONSE_CODES.SUCCESS,
   ): BaseResponse<T> {
-    return new BaseResponse<T>(data, code);
+    return new BaseResponse<T>(code, data);
   }
 
-  static emptyData(
-    data: [] | null,
+  static createEmptyResponse(
     code = RESPONSE_CODES.EMPTY_DATA,
-  ): BaseResponse<[] | null> {
-    return new BaseResponse<[] | null>(data, code);
+  ): BaseResponse<null> {
+    return new BaseResponse<null>(code, null);
+  }
+
+  getCode(): number {
+    return this.code;
+  }
+
+  getData(): T | undefined {
+    return this.data;
   }
 }
