@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { SiteController } from './site.controller';
 
-@Module({})
+@Module({
+  controllers: [SiteController]
+})
 export class SiteModule {}
