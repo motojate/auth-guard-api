@@ -12,7 +12,6 @@ import { KafkaModule } from './kafka/kafka.module';
 import { SiteModule } from './site/site.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { TestService } from './test/test.service';
 
 @Module({
   imports: [
@@ -40,6 +39,6 @@ import { TestService } from './test/test.service';
     SiteModule
   ],
   controllers: [AppController],
-  providers: [AppService, TestService]
+  providers: [AppService]
 })
 export class AppModule {}
