@@ -4,7 +4,7 @@ import { SiteCreateCommand } from './site-create.command';
 import { SiteType } from '@prisma/client';
 
 @CommandHandler(SiteCreateCommand)
-export class UserCreateHandler implements ICommandHandler<SiteCreateCommand> {
+export class SiteCreateHandler implements ICommandHandler<SiteCreateCommand> {
   constructor(private readonly prisma: PrismaService) {}
 
   async execute(command: SiteCreateCommand): Promise<SiteType> {
